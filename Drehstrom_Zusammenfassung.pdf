@@ -1,0 +1,107 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 5 0 R /Resources << /Font << /F1 3 0 R /F2 6 0 R >> >> >>
+endobj
+5 0 obj
+<< /Length 3939 >>
+stream
+0.130 0.540 0.130 rg 50 777 495 19 re f
+1 1 1 rg
+BT /F1 13 Tf 54 781 Td (Drehstrom \(3-Phasen-Wechselstrom\) - Zusammenfassung) Tj ET
+0 0 0 rg
+0.860 0.940 0.860 rg 50 749 495 15 re f
+0 0.31 0 rg
+BT /F1 11 Tf 53 751 Td (Grundbegriffe) Tj ET
+0 0 0 rg
+BT /F1 10 Tf 60 732 Td (Leistungsarten in Drehstromnetzen:) Tj ET
+0.950 0.950 0.950 rg 50 716 495 15 re f
+BT /F2 10 Tf 56 718 Td (Wirkleistung   P  [W]    - wird in Waerme/Arbeit umgewandelt) Tj ET
+0.950 0.950 0.950 rg 50 699 495 15 re f
+BT /F2 10 Tf 56 701 Td (Blindleistung  Q  [var]  - wird gespeichert und zurueckgegeben) Tj ET
+0.950 0.950 0.950 rg 50 682 495 15 re f
+BT /F2 10 Tf 56 684 Td (Scheinleistung S  [VA]   - S = sqrt\(P^2 + Q^2\)) Tj ET
+BT /F1 10 Tf 60 667 Td (Leistungsfaktor: cos\(phi\) = P / S   \(phi = Winkel im Leistungsdreieck\)) Tj ET
+0.950 0.950 0.950 rg 50 651 495 15 re f
+BT /F2 10 Tf 56 653 Td (Parallelwiderstand: R_Ers = \(R1 * R2\) / \(R1 + R2\)) Tj ET
+0.860 0.940 0.860 rg 50 626 495 15 re f
+0 0.31 0 rg
+BT /F1 11 Tf 53 628 Td (Aufgabe 1 - Sternschaltung \(Grundformel\)) Tj ET
+0 0 0 rg
+BT /F1 10 Tf 60 609 Td (Gegeben: U_L = 400 V \(Leiterspannung\)) Tj ET
+0.950 0.950 0.950 rg 50 593 495 15 re f
+BT /F2 10 Tf 56 595 Td (U_str = U_L / sqrt\(3\) = 400 V / 1,732 = 230,94 V) Tj ET
+BT /F1 10 Tf 60 578 Td (Die Strangspannung \(~230 V\) entspricht der bekannten Haushaltsspannung.) Tj ET
+0.860 0.940 0.860 rg 50 554 495 15 re f
+0 0.31 0 rg
+BT /F1 11 Tf 53 556 Td (Aufgabe 2 - Sternschaltung, rein ohmsche Last  \(phi = 0 deg, R = 32 Ohm\)) Tj ET
+0 0 0 rg
+BT /F1 10 Tf 60 537 Td (a\) Strangspannung:) Tj ET
+0.950 0.950 0.950 rg 50 521 495 15 re f
+BT /F2 10 Tf 56 523 Td (U_str = U_L / sqrt\(3\) = 230,94 V) Tj ET
+BT /F1 10 Tf 60 506 Td (b\) Strangstrom:) Tj ET
+0.950 0.950 0.950 rg 50 490 495 15 re f
+BT /F2 10 Tf 56 492 Td (I_str = U_str / R = 230,94 V / 32 Ohm = 7,21 A) Tj ET
+BT /F1 10 Tf 60 475 Td (c\) Strangleistung:) Tj ET
+0.950 0.950 0.950 rg 50 459 495 15 re f
+BT /F2 10 Tf 56 461 Td (P_str = U_str * I_str = 230,94 V * 7,21 A = 1 665,07 W) Tj ET
+BT /F1 10 Tf 60 444 Td (d\) Gesamtleistung \(zwei Berechnungswege\):) Tj ET
+0.950 0.950 0.950 rg 50 428 495 15 re f
+BT /F2 10 Tf 56 430 Td (P_ges = 3 * P_str = 3 * 1 665,07 W = 4 995,21 W) Tj ET
+0.950 0.950 0.950 rg 50 411 495 15 re f
+BT /F2 10 Tf 56 413 Td (P_ges = sqrt\(3\) * U_L * I_L * cos\(phi\)) Tj ET
+0.950 0.950 0.950 rg 50 394 495 15 re f
+BT /F2 10 Tf 56 396 Td (      = 1,732 * 400 V * 7,21 A * 1 = 4 995,23 W   \(Probe: OK\)) Tj ET
+0.860 0.940 0.860 rg 50 369 495 15 re f
+0 0.31 0 rg
+BT /F1 11 Tf 53 371 Td (Aufgabe 3 - Dreieckschaltung  \(P_ges = 9 kW, U_L = 400 V\)) Tj ET
+0 0 0 rg
+BT /F1 10 Tf 60 352 Td (a\) Strangleistung:) Tj ET
+0.950 0.950 0.950 rg 50 336 495 15 re f
+BT /F2 10 Tf 56 338 Td (P_str = P_ges / 3 = 9 000 W / 3 = 3 000 W = 3 kW) Tj ET
+BT /F1 10 Tf 60 321 Td (b\) Strangwiderstand:) Tj ET
+0.950 0.950 0.950 rg 50 305 495 15 re f
+BT /F2 10 Tf 56 307 Td (I_str = P_str / U_str = 3 000 W / 400 V = 7,5 A) Tj ET
+0.950 0.950 0.950 rg 50 288 495 15 re f
+BT /F2 10 Tf 56 290 Td (R_str = U_str / I_str = 400 V / 7,5 A = 53,3 Ohm) Tj ET
+BT /F1 10 Tf 60 273 Td (c\) & d\) Anteiliger lambda-Anteil der Strangleistung:) Tj ET
+0.950 0.950 0.950 rg 50 257 495 15 re f
+BT /F2 10 Tf 56 259 Td (P_lambda     = 1/3 * P_ges     = 3 kW) Tj ET
+0.950 0.950 0.950 rg 50 240 495 15 re f
+BT /F2 10 Tf 56 242 Td (P_str,lambda = 1/3 * P_lambda  = 1 kW) Tj ET
+0.860 0.940 0.860 rg 50 213 495 15 re f
+0 0.31 0 rg
+BT /F1 11 Tf 53 215 Td (Kernaussage) Tj ET
+0 0 0 rg
+BT /F1 10 Tf 60 196 Td (Der Tafelinhalt behandelt die Berechnung von Spannungen, Stroemen und Leistungen in) Tj ET
+BT /F1 10 Tf 60 182 Td (symmetrischen Drehstromnetzen - sowohl fuer Stern- als auch Dreieckschaltungen. Dabei) Tj ET
+BT /F1 10 Tf 60 168 Td (wird zwischen Strang- und Leiterspannung/-strom unterschieden und die Gesamtleistung) Tj ET
+BT /F1 10 Tf 60 154 Td (auf zwei Wegen ermittelt \(Formel direkt + Drehstromformel\).) Tj ET
+endstream
+endobj
+6 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>
+endobj
+xref
+0 7
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000121 00000 n 
+0000000218 00000 n 
+0000000354 00000 n 
+0000004345 00000 n 
+trailer
+<< /Size 7 /Root 1 0 R >>
+startxref
+4440
+%%EOF
