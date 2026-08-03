@@ -79,9 +79,9 @@ berücksichtigt, ebenso über Mitternacht hinweg.
 Mit **‹** und **›** blätterst du durch die Tage, **Heute** springt zurück.
 Die **Monatsübersicht** listet alle erfassten Tage des angezeigten Monats mit Summe unten.
 
-Die **Auftragsübersicht** listet die Aufträge des Monats mit Kunde, Ankunft, Anfahrt,
-Abfahrt, Heimfahrt und allen Tätigkeiten samt Uhrzeiten; unten steht die gesamte
-Fahrzeit des Monats (Hin- und Rückfahrten zusammen).
+Die **Auftragsübersicht** listet die Aufträge des Monats knapp: Tag, Kunde, Dauer und
+die Tätigkeiten mit Uhrzeiten, unten die Gesamtdauer. Auf dem Handy steht jeder Auftrag
+in drei Zeilen — Tag mit Dauer rechts, darunter der Kundenname, darunter die Tätigkeiten.
 Ein Klick auf eine Zeile springt zu dem Tag. Auf dem Handy wird daraus je Auftrag
 eine Karte, damit nichts seitlich aus dem Bild läuft.
 

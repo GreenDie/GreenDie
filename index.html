@@ -221,28 +221,30 @@ tr.jump:hover td{background:var(--card-2)}
 .subhead + table{margin-bottom:20px}
 /* Auftragsübersicht bricht auf schmalen Bildschirmen in Karten um */
 @media (max-width:620px){
-  #jobsTable table,#jobsTable tbody,#jobsTable tfoot,#jobsTable tr,#jobsTable td{display:block;width:auto}
+  #jobsTable table,#jobsTable tbody,#jobsTable tfoot{display:block;width:auto}
   #jobsTable thead{display:none}
   #jobsTable tr{
+    display:grid;grid-template-columns:1fr auto;gap:1px 10px;
     border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;margin-bottom:8px;
     background:var(--card-2)
   }
   #jobsTable tr.today{background:var(--accent-soft)}
-  #jobsTable td{border:0;padding:2px 0;text-align:left;white-space:normal}
-  #jobsTable td:empty{display:none}
-  #jobsTable td::before{
-    content:attr(data-l);font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;
-    text-transform:uppercase;color:var(--muted);display:inline-block;min-width:78px;vertical-align:top
-  }
-  #jobsTable td.name,#jobsTable td.wrapcell{max-width:none}
-  #jobsTable td.name small{display:inline;margin-left:6px}
-  #jobsTable .tlist{display:inline-block;vertical-align:top;padding-left:14px;max-width:calc(100% - 84px)}
+  #jobsTable td{display:block;border:0;padding:0;text-align:left;white-space:normal}
+  #jobsTable td[data-l="Tag"]{grid-column:1;grid-row:1;font-family:var(--mono);font-size:.72rem;
+    letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  #jobsTable td.dcell{grid-column:2;grid-row:1;text-align:right;font-size:1.05rem;font-weight:600}
+  #jobsTable td.name{grid-column:1/-1;grid-row:2;max-width:none;font-size:1rem;font-weight:600}
+  #jobsTable td.wrapcell{grid-column:1/-1;grid-row:3;max-width:none;margin-top:3px}
+  #jobsTable .tlist{padding-left:15px}
   #jobsTable tfoot tr{border-style:dashed;background:none}
+  #jobsTable tfoot td:empty{display:none}
+  #jobsTable tfoot td[data-l="Gesamt"]{font-weight:600;color:var(--ink)}
 }
 .tlist{margin:0;padding-left:16px;list-style:disc}
 .tlist li{margin:1px 0}
 .tlist b{font-family:var(--mono);font-weight:600;font-variant-numeric:tabular-nums;color:var(--muted)}
 th.l,td.name,.wrapcell{text-align:left}
+.dcell{font-family:var(--mono);font-variant-numeric:tabular-nums}
 .wrapcell{white-space:normal;min-width:170px;max-width:300px;font-family:var(--sans)}
 td.name{font-family:var(--sans);white-space:normal;min-width:130px}
 td.name small{display:block;font-family:var(--mono);font-size:.72rem;color:var(--muted)}
@@ -665,11 +667,13 @@ function renderJobsOverview(){
   var d0 = parseISO(current);
   $("jobsSummary").textContent = "Auftragsübersicht · " + MON[d0.getMonth()] + " " + d0.getFullYear();
 
-  var rows = [], travelSum = 0;
+  var rows = [], sum = 0;
   monthDays().forEach(function(iso){
-    db.days[iso].jobs.forEach(function(j){
-      rows.push({ iso:iso, j:j });
-      travelSum += (parseInt(j.travel,10) || 0) + (parseInt(j.home,10) || 0);
+    var d = db.days[iso];
+    d.jobs.forEach(function(j){
+      var min = jobMin(j, d);
+      sum += min;
+      rows.push({ iso:iso, j:j, min:min });
     });
   });
 
@@ -682,11 +686,8 @@ function renderJobsOverview(){
     var j = r.j, dt = parseISO(r.iso), ts = jobTasks(j);
     return '<tr class="jump'+(r.iso===current?" today":"")+'" data-goto="'+r.iso+'">' +
       '<td data-l="Tag">' + WD[dt.getDay()].slice(0,2) + ", " + pad(dt.getDate()) + "." + pad(dt.getMonth()+1) + ".</td>" +
-      '<td class="name" data-l="Kunde">' + (esc(j.customer) || "–") + (j.birth ? "<small>"+esc(j.birth)+"</small>" : "") + "</td>" +
-      '<td data-l="Ankunft">' + (j.arrival || "–") + "</td>" +
-      '<td data-l="Anfahrt">' + (j.travel ? esc(j.travel) + " Min." : "–") + "</td>" +
-      '<td data-l="Abfahrt">' + (j.depart || "–") + "</td>" +
-      '<td data-l="Heimfahrt">' + (j.home ? esc(j.home) + " Min." : "–") + "</td>" +
+      '<td class="name" data-l="Kunde">' + (esc(j.customer) || "–") + "</td>" +
+      '<td class="dcell" data-l="Dauer">' + (r.min > 0 ? hm(r.min) : "–") + "</td>" +
       '<td class="wrapcell" data-l="Tätigkeit">' + (ts.length
           ? '<ul class="tlist">' + ts.map(function(t){
               return "<li>" + (t.time ? '<b>'+t.time+'</b> ' : "") + esc(t.text) + "</li>";
@@ -695,11 +696,10 @@ function renderJobsOverview(){
   }).join("");
 
   $("jobsTable").innerHTML =
-    '<table><thead><tr><th>Tag</th><th class="l">Kunde</th><th>Ankunft</th><th>Anfahrt</th><th>Abfahrt</th><th>Heimfahrt</th><th class="l">Tätigkeiten</th></tr></thead>' +
+    '<table><thead><tr><th>Tag</th><th class="l">Kunde</th><th>Dauer</th><th class="l">Tätigkeiten</th></tr></thead>' +
       "<tbody>" + body + "</tbody>" +
       '<tfoot><tr><td data-l="Gesamt">' + rows.length + (rows.length===1?" Auftrag":" Aufträge") +
-        "</td><td></td>" + '<td data-l="Fahrzeit">' + (travelSum ? travelSum + " Min." : "–") +
-        "</td><td></td><td></td><td></td></tr></tfoot></table>";
+        "</td><td></td>" + '<td class="dcell" data-l="Summe">' + hm(sum) + "</td><td></td></tr></tfoot></table>";
 }
 
 // Klick auf eine Auftragszeile springt zum passenden Tag
