@@ -152,13 +152,31 @@ input[type=time]:focus-visible,input[type=date]:focus-visible,input[type=text]:f
 .field{flex:0 0 auto;min-width:0;display:flex;flex-direction:column;gap:3px}
 .names .field{flex:1 1 180px}
 .names .field.birth{flex:0 1 152px}
+.names .field.mini{flex:0 1 128px}
 .field span{font-family:var(--mono);font-size:.63rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .field input,.field textarea{
   font:inherit;font-size:.95rem;background:var(--card);color:var(--ink);
   border:1px solid var(--line);border-radius:var(--r);padding:8px 9px;width:100%
 }
 .field textarea{min-height:62px;resize:vertical;line-height:1.4}
-.field.birth input{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.field.birth input,.field.mini input{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.inl{display:flex;gap:6px;align-items:center}
+.inl input[type=time]{flex:1 1 auto;font-size:1.05rem;min-width:100px;background:var(--card)}
+
+/* Ergänzende Listen (Tätigkeiten, Material) */
+.list{display:flex;flex-direction:column;gap:6px;min-width:0}
+.litem{display:flex;gap:6px;align-items:center;flex-wrap:wrap;min-width:0}
+.litem input[type=text]{flex:1 1 150px;width:auto;min-width:0}
+.lrow{display:flex;gap:6px;align-items:center;flex:0 0 auto;margin-left:auto}
+.litem input[type=time]{flex:0 0 auto;width:auto;font-size:.95rem;min-width:104px;padding:6px 4px;background:var(--card)}
+.litem .now{padding:7px 8px;font-size:.65rem}
+.litem .icon{width:28px;height:28px;font-size:.9rem}
+.addmini{
+  align-self:flex-start;font:inherit;font-size:.76rem;font-weight:600;cursor:pointer;
+  background:none;border:1px dashed var(--line-strong);color:var(--muted);
+  border-radius:var(--r);padding:6px 11px
+}
+.addmini:hover{border-style:solid;border-color:var(--accent);color:var(--accent)}
 .job .times{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .job .times input[type=time]{font-size:1.05rem;min-width:92px;background:var(--card)}
 .dur{
@@ -211,6 +229,29 @@ tr.jump:hover td{background:var(--card-2)}
   color:var(--muted);font-weight:600;margin:2px 0 6px
 }
 .subhead + table{margin-bottom:20px}
+/* Auftragsübersicht bricht auf schmalen Bildschirmen in Karten um */
+@media (max-width:620px){
+  #jobsTable table,#jobsTable tbody,#jobsTable tfoot,#jobsTable tr,#jobsTable td{display:block;width:auto}
+  #jobsTable thead{display:none}
+  #jobsTable tr{
+    border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;margin-bottom:8px;
+    background:var(--card-2)
+  }
+  #jobsTable tr.today{background:var(--accent-soft)}
+  #jobsTable td{border:0;padding:2px 0;text-align:left;white-space:normal}
+  #jobsTable td:empty{display:none}
+  #jobsTable td::before{
+    content:attr(data-l);font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--muted);display:inline-block;min-width:78px;vertical-align:top
+  }
+  #jobsTable td.name,#jobsTable td.wrapcell{max-width:none}
+  #jobsTable td.name small{display:inline;margin-left:6px}
+  #jobsTable .tlist{display:inline-block;vertical-align:top;padding-left:14px;max-width:calc(100% - 84px)}
+  #jobsTable tfoot tr{border-style:dashed;background:none}
+}
+.tlist{margin:0;padding-left:16px;list-style:disc}
+.tlist li{margin:1px 0}
+.tlist b{font-family:var(--mono);font-weight:600;font-variant-numeric:tabular-nums;color:var(--muted)}
 th.l,td.name,.wrapcell{text-align:left}
 .wrapcell{white-space:normal;min-width:170px;max-width:300px;font-family:var(--sans)}
 td.name{font-family:var(--sans);white-space:normal;min-width:130px}
@@ -388,8 +429,32 @@ function day(iso){
   }
   if(!d.breaks) d.breaks = [];
   if(!d.jobs) d.jobs = [];
+  d.jobs.forEach(migrateJob);
   return d;
 }
+// Frühere Textfelder in Listen überführen, damit alte Einträge erhalten bleiben
+function migrateJob(j){
+  if(!j.tasks){
+    j.tasks = lines(j.task).map(function(t){ return { text:t, time:"" }; });
+    delete j.task;
+  }
+  if(!j.materials){
+    j.materials = lines(j.material).map(function(t){ return { text:t }; });
+    delete j.material;
+  }
+  if(j.arrival === undefined) j.arrival = "";
+  if(j.travel === undefined) j.travel = "";
+}
+function lines(s){
+  return String(s||"").split("\n").map(function(t){ return t.trim(); }).filter(Boolean);
+}
+function newJob(){
+  return { customer:"", birth:"", arrival:"", travel:"", tasks:[{text:"",time:""}],
+           materials:[{text:""}], start:"", end:"", running:false, startedAt:null };
+}
+function jobTasks(j){ return (j.tasks||[]).filter(function(t){ return (t.text||"").trim(); }); }
+function jobMaterials(j){ return (j.materials||[]).filter(function(m){ return (m.text||"").trim(); }); }
+function taskLabel(t){ return (t.time ? t.time + " " : "") + t.text; }
 function isEmptyDay(d){
   if(!d) return true;
   if(d.start || d.end || (d.note||"").trim()) return false;
@@ -497,10 +562,37 @@ function renderJobs(d){
           '<label class="field birth"><span>Geburtsdatum</span>' +
             '<input type="text" data-job="'+i+'" data-key="birth" value="'+esc(j.birth)+'" placeholder="TT.MM.JJJJ" inputmode="numeric"></label>' +
         '</div>' +
-        '<label class="field"><span>Auftrag / Tätigkeit</span>' +
-          '<textarea data-job="'+i+'" data-key="task" placeholder="Was wurde gemacht?">'+esc(j.task)+'</textarea></label>' +
-        '<label class="field"><span>Material</span>' +
-          '<textarea data-job="'+i+'" data-key="material" placeholder="Verbautes Material, Teile, Mengen …">'+esc(j.material)+'</textarea></label>' +
+        '<div class="names">' +
+          '<div class="field"><span>Ankunft</span><span class="inl">' +
+            '<input type="time" data-job="'+i+'" data-key="arrival" value="'+(j.arrival||"")+'" aria-label="Ankunft beim Kunden">' +
+            '<button class="now" type="button" data-nowjob="'+i+'" data-key="arrival">Jetzt</button></span></div>' +
+          '<label class="field mini"><span>Anfahrt (Min.)</span>' +
+            '<input type="text" data-job="'+i+'" data-key="travel" value="'+esc(j.travel)+'" placeholder="z. B. 20" inputmode="numeric"></label>' +
+        '</div>' +
+        '<div class="field"><span>Tätigkeiten</span><div class="list">' +
+          j.tasks.map(function(t,k){
+            return '<div class="litem">' +
+              '<input type="text" data-tj="'+i+'" data-ti="'+k+'" data-key="text" value="'+esc(t.text)+'" placeholder="Was wurde gemacht?">' +
+              '<span class="lrow">' +
+                '<input type="time" data-tj="'+i+'" data-ti="'+k+'" data-key="time" value="'+(t.time||"")+'" aria-label="Uhrzeit der Tätigkeit">' +
+                '<button class="now" type="button" data-nowtask="'+i+'" data-idx="'+k+'">Jetzt</button>' +
+                '<button class="icon" type="button" data-deltask="'+i+'" data-idx="'+k+'" aria-label="Tätigkeit löschen">×</button>' +
+              '</span>' +
+            '</div>';
+          }).join("") +
+          '<button class="addmini" type="button" data-addtask="'+i+'">+ Tätigkeit</button>' +
+        '</div></div>' +
+        '<div class="field"><span>Material</span><div class="list">' +
+          j.materials.map(function(m,k){
+            return '<div class="litem">' +
+              '<input type="text" data-mj="'+i+'" data-mi="'+k+'" value="'+esc(m.text)+'" placeholder="Teil, Menge">' +
+              '<span class="lrow">' +
+                '<button class="icon" type="button" data-delmat="'+i+'" data-idx="'+k+'" aria-label="Material löschen">×</button>' +
+              '</span>' +
+            '</div>';
+          }).join("") +
+          '<button class="addmini" type="button" data-addmat="'+i+'">+ Material</button>' +
+        '</div></div>' +
       '</div>' +
       '<div class="times">' +
         '<input type="time" data-job="'+i+'" data-key="start" value="'+(j.start||"")+'" aria-label="Auftrag Beginn">' +
@@ -538,7 +630,8 @@ function renderTicker(){
   var r = runningJob(), box = $("ticker");
   if(!r){ box.innerHTML = ""; box.className = ""; return; }
   box.className = "ticker";
-  var name = [r.job.customer, flat(r.job.task)].filter(Boolean).join(" · ") || "Auftrag ohne Namen";
+  var firstTask = jobTasks(r.job)[0];
+  var name = [r.job.customer, firstTask ? firstTask.text : ""].filter(Boolean).join(" · ") || "Auftrag ohne Namen";
   if(r.iso !== current) name += " (" + deDate(r.iso) + ")";
   box.innerHTML =
     '<span class="dot"></span>' +
@@ -588,17 +681,11 @@ function renderJobsOverview(){
   var d0 = parseISO(current);
   $("jobsSummary").textContent = "Auftragsübersicht · " + MON[d0.getMonth()] + " " + d0.getFullYear();
 
-  var rows = [], groups = {}, keys = [], total = 0;
+  var rows = [], travelSum = 0;
   monthDays().forEach(function(iso){
     db.days[iso].jobs.forEach(function(j){
-      var min = jobSec(j)/60;
-      total += min;
-      rows.push({ iso:iso, j:j, min:min });
-      var name = (j.customer||"").trim(), birth = (j.birth||"").trim();
-      var key = (name+"|"+birth).toLowerCase() || "|";
-      if(!groups[key]){ groups[key] = { name:name, birth:birth, min:0, count:0 }; keys.push(key); }
-      groups[key].min += min;
-      groups[key].count++;
+      rows.push({ iso:iso, j:j });
+      travelSum += parseInt(j.travel, 10) || 0;
     });
   });
 
@@ -607,39 +694,26 @@ function renderJobsOverview(){
     return;
   }
 
-  keys.sort(function(a,b){ return groups[b].min - groups[a].min; });
-  var perCustomer = keys.map(function(k){
-    var g = groups[k];
-    return "<tr>" +
-      '<td class="name">' + (esc(g.name) || "<em>ohne Kunde</em>") +
-        (g.birth ? "<small>"+esc(g.birth)+"</small>" : "") + "</td>" +
-      "<td>" + g.count + "</td>" +
-      "<td>" + hm(g.min) + "</td>" +
-      "<td>" + dec(g.min) + "</td></tr>";
-  }).join("");
-
-  var detail = rows.map(function(r){
-    var j = r.j, dt = parseISO(r.iso);
+  var body = rows.map(function(r){
+    var j = r.j, dt = parseISO(r.iso), ts = jobTasks(j);
     return '<tr class="jump'+(r.iso===current?" today":"")+'" data-goto="'+r.iso+'">' +
-      "<td>" + WD[dt.getDay()].slice(0,2) + ", " + pad(dt.getDate()) + "." + pad(dt.getMonth()+1) + ".</td>" +
-      '<td class="name">' + (esc(j.customer) || "–") + (j.birth ? "<small>"+esc(j.birth)+"</small>" : "") + "</td>" +
-      '<td class="wrapcell">' + (esc(flat(j.task)) || "–") + "</td>" +
-      '<td class="wrapcell">' + (esc(flat(j.material)) || "–") + "</td>" +
-      "<td>" + (j.start||"–") + "</td><td>" + (j.end||"–") + "</td>" +
-      "<td>" + (j.running ? hms(jobSec(j)) : hm(r.min)) + "</td></tr>";
+      '<td data-l="Tag">' + WD[dt.getDay()].slice(0,2) + ", " + pad(dt.getDate()) + "." + pad(dt.getMonth()+1) + ".</td>" +
+      '<td class="name" data-l="Kunde">' + (esc(j.customer) || "–") + (j.birth ? "<small>"+esc(j.birth)+"</small>" : "") + "</td>" +
+      '<td data-l="Ankunft">' + (j.arrival || "–") + "</td>" +
+      '<td data-l="Anfahrt">' + (j.travel ? esc(j.travel) + " Min." : "–") + "</td>" +
+      '<td class="wrapcell" data-l="Tätigkeit">' + (ts.length
+          ? '<ul class="tlist">' + ts.map(function(t){
+              return "<li>" + (t.time ? '<b>'+t.time+'</b> ' : "") + esc(t.text) + "</li>";
+            }).join("") + "</ul>"
+          : "–") + "</td></tr>";
   }).join("");
 
   $("jobsTable").innerHTML =
-    '<p class="subhead">Summe je Kunde</p>' +
-    "<table><thead><tr><th>Kunde</th><th>Einsätze</th><th>Summe</th><th>Dezimal</th></tr></thead>" +
-      "<tbody>" + perCustomer + "</tbody>" +
-      "<tfoot><tr><td>" + keys.length + (keys.length===1?" Kunde":" Kunden") + "</td><td>" + rows.length +
-        "</td><td>" + hm(total) + "</td><td>" + dec(total) + "</td></tr></tfoot></table>" +
-    '<p class="subhead">Einzelne Aufträge</p>' +
-    '<table><thead><tr><th>Tag</th><th class="l">Kunde</th><th class="l">Auftrag / Tätigkeit</th><th class="l">Material</th><th>Von</th><th>Bis</th><th>Dauer</th></tr></thead>' +
-      "<tbody>" + detail + "</tbody>" +
-      "<tfoot><tr><td>" + rows.length + (rows.length===1?" Auftrag":" Aufträge") +
-        "</td><td></td><td></td><td></td><td></td><td></td><td>" + hm(total) + "</td></tr></tfoot></table>";
+    '<table><thead><tr><th>Tag</th><th class="l">Kunde</th><th>Ankunft</th><th>Anfahrt</th><th class="l">Tätigkeiten</th></tr></thead>' +
+      "<tbody>" + body + "</tbody>" +
+      '<tfoot><tr><td data-l="Gesamt">' + rows.length + (rows.length===1?" Auftrag":" Aufträge") +
+        "</td><td></td><td></td>" + '<td data-l="Anfahrt">' + (travelSum ? travelSum + " Min." : "–") +
+        "</td><td></td></tr></tfoot></table>";
 }
 
 // Klick auf eine Auftragszeile springt zum passenden Tag
@@ -666,6 +740,17 @@ document.addEventListener("input", function(e){
     var open = d.breaks.some(function(b){ return b.from && !b.to; });
     $("pauseToggle").textContent = open ? "Pause beenden" : "Pause starten";
     $("pauseToggle").className = open ? "btn warn" : "btn";
+    return;
+  }
+
+  if(el.dataset.tj !== undefined){
+    d.jobs[+el.dataset.tj].tasks[+el.dataset.ti][el.dataset.key] = el.value;
+    save(); renderTicker(); renderOverviews();
+    return;
+  }
+  if(el.dataset.mj !== undefined){
+    d.jobs[+el.dataset.mj].materials[+el.dataset.mi].text = el.value;
+    save(); renderOverviews();
     return;
   }
 
@@ -698,9 +783,43 @@ document.addEventListener("click", function(e){
     if(!d.breaks.length) d.breaks.push({from:"",to:""});
     save(); renderAll(); return;
   }
+  if(el.dataset.nowjob !== undefined){
+    d.jobs[+el.dataset.nowjob][el.dataset.key] = nowHM();
+    writeNow(); renderAll(); return;
+  }
+  if(el.dataset.addtask !== undefined){
+    var jt = d.jobs[+el.dataset.addtask];
+    jt.tasks.push({ text:"", time:"" });
+    save(); renderAll();
+    focusLast('[data-tj="'+el.dataset.addtask+'"][data-key="text"]');
+    return;
+  }
+  if(el.dataset.nowtask !== undefined){
+    d.jobs[+el.dataset.nowtask].tasks[+el.dataset.idx].time = nowHM();
+    writeNow(); renderAll(); return;
+  }
+  if(el.dataset.deltask !== undefined){
+    var jd2 = d.jobs[+el.dataset.deltask];
+    jd2.tasks.splice(+el.dataset.idx, 1);
+    if(!jd2.tasks.length) jd2.tasks.push({ text:"", time:"" });
+    save(); renderAll(); return;
+  }
+  if(el.dataset.addmat !== undefined){
+    d.jobs[+el.dataset.addmat].materials.push({ text:"" });
+    save(); renderAll();
+    focusLast('[data-mj="'+el.dataset.addmat+'"]');
+    return;
+  }
+  if(el.dataset.delmat !== undefined){
+    var jd3 = d.jobs[+el.dataset.delmat];
+    jd3.materials.splice(+el.dataset.idx, 1);
+    if(!jd3.materials.length) jd3.materials.push({ text:"" });
+    save(); renderAll(); return;
+  }
   if(el.dataset.deljob !== undefined){
     var jd = d.jobs[+el.dataset.deljob];
-    var label = [jd.customer, jd.task].filter(Boolean).join(" · ") || "diesen Auftrag";
+    var firstT = jobTasks(jd)[0];
+    var label = [jd.customer, firstT ? firstT.text : ""].filter(Boolean).join(" · ") || "diesen Auftrag";
     if(confirm("„"+label+"“ löschen?")){ d.jobs.splice(+el.dataset.deljob,1); save(); renderAll(); }
     return;
   }
@@ -748,8 +867,12 @@ function togglePause(d){
   }
   save(); renderAll();
 }
+function focusLast(sel){
+  var all = document.querySelectorAll("#jobs " + sel);
+  if(all.length) all[all.length-1].focus();
+}
 function addJob(d){
-  d.jobs.push({ customer:"", birth:"", task:"", material:"", start:"", end:"", running:false, startedAt:null });
+  d.jobs.push(newJob());
   save(); renderAll();
   var inputs = document.querySelectorAll('#jobs [data-key="customer"]');
   if(inputs.length) inputs[inputs.length-1].focus();
@@ -809,17 +932,20 @@ function exportDays(){
   download("Zeiterfassung_"+current.slice(0,7)+".csv", rows.map(function(r){ return r.map(csvCell).join(";"); }).join("\r\n"));
 }
 function exportJobs(){
-  var list = monthDays(), rows = [["Datum","Kunde","Geburtsdatum","Auftrag / Tätigkeit","Material","Von","Bis","Dauer (h)","Dauer (dez.)"]], sum = 0, n = 0;
+  var list = monthDays(), rows = [["Datum","Kunde","Geburtsdatum","Ankunft","Anfahrt (Min.)","Tätigkeiten","Material","Von","Bis","Dauer (h)","Dauer (dez.)"]], sum = 0, n = 0;
   list.forEach(function(iso){
     db.days[iso].jobs.forEach(function(j){
       var min = jobSec(j)/60;
       sum += min; n++;
-      rows.push([deDate(iso), j.customer, j.birth, flat(j.task), flat(j.material), j.start, j.end, hm(min), dec(min)]);
+      rows.push([deDate(iso), j.customer, j.birth, j.arrival, j.travel,
+                 jobTasks(j).map(taskLabel).join(" · "),
+                 jobMaterials(j).map(function(m){ return m.text; }).join(" · "),
+                 j.start, j.end, hm(min), dec(min)]);
     });
   });
   if(!n) return alert("Für diesen Monat sind keine Aufträge erfasst.");
   rows.push([]);
-  rows.push(["Summe","","","","","","",hm(sum),dec(sum)]);
+  rows.push(["Summe","","","","","","","","",hm(sum),dec(sum)]);
   download("Auftraege_"+current.slice(0,7)+".csv", rows.map(function(r){ return r.map(csvCell).join(";"); }).join("\r\n"));
 }
 function exportBackup(){

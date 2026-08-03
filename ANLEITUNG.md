@@ -45,9 +45,15 @@ Pro Auftrag werden erfasst:
 |---|---|
 | Kunde | Name |
 | Geburtsdatum | z. B. 04.09.1958 |
-| Auftrag / Tätigkeit | mehrzeilig — was gemacht wurde |
-| Material | mehrzeilig — verbaute Teile, Mengen |
+| Ankunft | Uhrzeit beim Kunden, per **Jetzt** stempelbar |
+| Anfahrt | Fahrzeit in Minuten, z. B. 20 |
+| Tätigkeiten | Liste — jede Zeile mit eigener Uhrzeit, **+ Tätigkeit** hängt eine an |
+| Material | Liste — eine Zeile je Teil, **+ Material** hängt eine an |
 | Beginn / Ende | Uhrzeiten, von Hand oder per Stoppuhr |
+
+Tätigkeiten und Material sind Listen statt Textfelder: jede Zeile ist ein eigener
+Eintrag, das × daneben löscht sie. Bei den Tätigkeiten stempelt **Jetzt** die Uhrzeit
+in die jeweilige Zeile.
 
 - **+ Auftrag** legt einen neuen Auftrag an.
 - **Start** / **Stopp** stempeln Beginn und Ende, ebenfalls auf 5 Minuten aufgerundet.
@@ -64,9 +70,10 @@ Pro Auftrag werden erfasst:
 Mit **‹** und **›** blätterst du durch die Tage, **Heute** springt zurück.
 Die **Monatsübersicht** listet alle erfassten Tage des angezeigten Monats mit Summe unten.
 
-Die **Auftragsübersicht** zeigt denselben Monat aus Sicht der Aufträge:
-oben die Summe je Kunde (nach Stunden sortiert, für die Abrechnung), darunter jeden
-Einsatz einzeln mit Tätigkeit und Material. Ein Klick auf eine Zeile springt zu dem Tag.
+Die **Auftragsübersicht** listet die Aufträge des Monats mit Kunde, Ankunft, Anfahrt
+und allen Tätigkeiten samt Uhrzeiten; unten steht die gesamte Anfahrtszeit.
+Ein Klick auf eine Zeile springt zu dem Tag. Auf dem Handy wird daraus je Auftrag
+eine Karte, damit nichts seitlich aus dem Bild läuft.
 
 - **CSV: Tage (Monat)** — Stundenzettel je Tag, mit Dezimalstunden und Monatssumme
 - **CSV: Aufträge (Monat)** — jede Auftragszeit einzeln mit Kunde, Geburtsdatum,
