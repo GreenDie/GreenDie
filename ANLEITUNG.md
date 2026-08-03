@@ -36,9 +36,17 @@ Schichten über Mitternacht (22:00 bis 02:30) werden korrekt gerechnet.
 
 ## Aufträge
 
-Pro Auftrag werden **Kunde**, **Auftrag**, **Beginn** und **Ende** erfasst.
+Pro Auftrag werden erfasst:
 
-- **+ Auftrag & starten** legt einen Auftrag an und startet sofort die Stoppuhr.
+| Feld | |
+|---|---|
+| Kunde | Name |
+| Geburtsdatum | z. B. 04.09.1958 |
+| Auftrag / Tätigkeit | mehrzeilig — was gemacht wurde |
+| Material | mehrzeilig — verbaute Teile, Mengen |
+| Beginn / Ende | Uhrzeiten, von Hand oder per Stoppuhr |
+
+- **+ Auftrag** legt einen neuen Auftrag an.
 - **Start** / **Stopp** timen die Zeit sekundengenau; rechts läuft die Uhr sichtbar mit.
 - Solange etwas läuft, zeigt das Band ganz oben Kunde und laufende Zeit — auch wenn du
   gerade einen anderen Tag ansiehst. Der Stopp-Knopf dort beendet die Messung von überall.
@@ -52,7 +60,8 @@ Mit **‹** und **›** blätterst du durch die Tage, **Heute** springt zurück.
 Die **Monatsübersicht** listet alle erfassten Tage des angezeigten Monats mit Summe unten.
 
 - **CSV: Tage (Monat)** — Stundenzettel je Tag, mit Dezimalstunden und Monatssumme
-- **CSV: Aufträge (Monat)** — jede Auftragszeit einzeln, für die Abrechnung nach Kunde
+- **CSV: Aufträge (Monat)** — jede Auftragszeit einzeln mit Kunde, Geburtsdatum,
+  Tätigkeit und Material, für die Abrechnung
 - **Sicherung speichern / laden** — alle Daten als JSON-Datei
 
 Die CSV-Dateien sind mit Semikolon getrennt und haben Komma als Dezimaltrennzeichen,

@@ -147,13 +147,18 @@ input[type=time]:focus-visible,input[type=date]:focus-visible,input[type=text]:f
 /* ---------- Aufträge ---------- */
 .job{border:1px solid var(--line);border-radius:var(--r);padding:10px;margin-bottom:10px;background:var(--card-2)}
 .job.running{border-color:var(--run);box-shadow:inset 3px 0 0 var(--run)}
-.job .names{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:9px}
-.field{flex:1 1 180px;min-width:0;display:flex;flex-direction:column;gap:3px}
+.jfields{display:flex;flex-direction:column;gap:9px;margin-bottom:10px}
+.job .names{display:flex;gap:8px;flex-wrap:wrap}
+.field{flex:0 0 auto;min-width:0;display:flex;flex-direction:column;gap:3px}
+.names .field{flex:1 1 180px}
+.names .field.birth{flex:0 1 152px}
 .field span{font-family:var(--mono);font-size:.63rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-.field input{
+.field input,.field textarea{
   font:inherit;font-size:.95rem;background:var(--card);color:var(--ink);
   border:1px solid var(--line);border-radius:var(--r);padding:8px 9px;width:100%
 }
+.field textarea{min-height:62px;resize:vertical;line-height:1.4}
+.field.birth input{font-family:var(--mono);font-variant-numeric:tabular-nums}
 .job .times{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .job .times input[type=time]{font-size:1.05rem;min-width:92px;background:var(--card)}
 .dur{
@@ -257,7 +262,6 @@ tr.today td{background:var(--accent-soft)}
       <div id="jobs"></div>
       <div class="addline">
         <button class="btn primary" id="addJob" type="button">+ Auftrag</button>
-        <button class="btn" id="addJobRun" type="button">+ Auftrag &amp; starten</button>
       </div>
     </section>
   </div>
@@ -307,13 +311,19 @@ function load(){
     }
   }catch(e){ /* beschädigte Daten ignorieren, leer starten */ }
 }
-function save(){
+function writeNow(){                       // sofort auf die Platte
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(function(){
-    try{ localStorage.setItem(KEY, JSON.stringify(db)); }
-    catch(e){ alert("Speichern nicht möglich: " + e.message); }
-  }, 120);
+  saveTimer = null;
+  try{ localStorage.setItem(KEY, JSON.stringify(db)); }
+  catch(e){ alert("Speichern nicht möglich: " + e.message); }
 }
+function save(){                           // beim Tippen gebündelt
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(writeNow, 120);
+}
+// Nichts verlieren, wenn die App weggewischt oder die Seite geschlossen wird
+window.addEventListener("pagehide", writeNow);
+document.addEventListener("visibilitychange", function(){ if(document.hidden) writeNow(); });
 
 /* ---------------- Zeit-Helfer ---------------- */
 function pad(n){ return String(n).padStart(2,"0"); }
@@ -448,18 +458,24 @@ function renderJobs(d){
   var box = $("jobs");
   box.innerHTML = "";
   if(!d.jobs.length){
-    box.innerHTML = '<p class="empty">Noch kein Auftrag erfasst. „+ Auftrag &amp; starten“ stempelt sofort ein.</p>';
+    box.innerHTML = '<p class="empty">Noch kein Auftrag erfasst. Mit „+ Auftrag“ anlegen, „Start“ beginnt die Zeitmessung.</p>';
     return;
   }
   d.jobs.forEach(function(j, i){
     var el = document.createElement("div");
     el.className = "job" + (j.running ? " running" : "");
     el.innerHTML =
-      '<div class="names">' +
-        '<label class="field"><span>Kunde</span>' +
-          '<input type="text" data-job="'+i+'" data-key="customer" value="'+esc(j.customer)+'" placeholder="Kundenname"></label>' +
-        '<label class="field"><span>Auftrag</span>' +
-          '<input type="text" data-job="'+i+'" data-key="task" value="'+esc(j.task)+'" placeholder="Tätigkeit / Auftragsnummer"></label>' +
+      '<div class="jfields">' +
+        '<div class="names">' +
+          '<label class="field"><span>Kunde</span>' +
+            '<input type="text" data-job="'+i+'" data-key="customer" value="'+esc(j.customer)+'" placeholder="Kundenname"></label>' +
+          '<label class="field birth"><span>Geburtsdatum</span>' +
+            '<input type="text" data-job="'+i+'" data-key="birth" value="'+esc(j.birth)+'" placeholder="TT.MM.JJJJ" inputmode="numeric"></label>' +
+        '</div>' +
+        '<label class="field"><span>Auftrag / Tätigkeit</span>' +
+          '<textarea data-job="'+i+'" data-key="task" placeholder="Was wurde gemacht?">'+esc(j.task)+'</textarea></label>' +
+        '<label class="field"><span>Material</span>' +
+          '<textarea data-job="'+i+'" data-key="material" placeholder="Verbautes Material, Teile, Mengen …">'+esc(j.material)+'</textarea></label>' +
       '</div>' +
       '<div class="times">' +
         '<input type="time" data-job="'+i+'" data-key="start" value="'+(j.start||"")+'" aria-label="Auftrag Beginn">' +
@@ -497,7 +513,7 @@ function renderTicker(){
   var r = runningJob(), box = $("ticker");
   if(!r){ box.innerHTML = ""; box.className = ""; return; }
   box.className = "ticker";
-  var name = [r.job.customer, r.job.task].filter(Boolean).join(" · ") || "Auftrag ohne Namen";
+  var name = [r.job.customer, flat(r.job.task)].filter(Boolean).join(" · ") || "Auftrag ohne Namen";
   if(r.iso !== current) name += " (" + deDate(r.iso) + ")";
   box.innerHTML =
     '<span class="dot"></span>' +
@@ -602,7 +618,7 @@ document.addEventListener("click", function(e){
       j.running = true; j.startedAt = Date.now(); j.start = nowHM(); j.end = ""; delete j.sec;
       if(!d.start) d.start = nowHM();      // erster Start stempelt den Tag ein
     }
-    save(); renderAll(); return;
+    writeNow(); renderAll(); return;       // Stempelzeiten nie verzögert speichern
   }
 
   switch(el.id){
@@ -611,8 +627,7 @@ document.addEventListener("click", function(e){
     case "todayBtn": current = isoToday(); renderAll(); break;
     case "addBreak": d.breaks.push({from:"",to:""}); save(); renderAll(); break;
     case "pauseToggle": togglePause(d); break;
-    case "addJob": addJob(d,false); break;
-    case "addJobRun": addJob(d,true); break;
+    case "addJob": addJob(d); break;
     case "clearDay": clearDay(); break;
     case "csvDays": exportDays(); break;
     case "csvJobs": exportJobs(); break;
@@ -640,14 +655,8 @@ function togglePause(d){
   }
   save(); renderAll();
 }
-function addJob(d, start){
-  var j = { customer:"", task:"", start:"", end:"", running:false, startedAt:null };
-  d.jobs.push(j);
-  if(start){
-    stopAllRunning();
-    j.running = true; j.startedAt = Date.now(); j.start = nowHM();
-    if(!d.start) d.start = nowHM();
-  }
+function addJob(d){
+  d.jobs.push({ customer:"", birth:"", task:"", material:"", start:"", end:"", running:false, startedAt:null });
   save(); renderAll();
   var inputs = document.querySelectorAll('#jobs [data-key="customer"]');
   if(inputs.length) inputs[inputs.length-1].focus();
@@ -695,6 +704,7 @@ function monthDays(){
   }).sort();
 }
 function deDate(iso){ var p=iso.split("-"); return p[2]+"."+p[1]+"."+p[0]; }
+function flat(s){ return String(s||"").replace(/\s*\n\s*/g, " · "); }
 
 function exportDays(){
   var list = monthDays();
@@ -711,17 +721,17 @@ function exportDays(){
   download("Zeiterfassung_"+current.slice(0,7)+".csv", rows.map(function(r){ return r.map(csvCell).join(";"); }).join("\r\n"));
 }
 function exportJobs(){
-  var list = monthDays(), rows = [["Datum","Kunde","Auftrag","Von","Bis","Dauer (h)","Dauer (dez.)"]], sum = 0, n = 0;
+  var list = monthDays(), rows = [["Datum","Kunde","Geburtsdatum","Auftrag / Tätigkeit","Material","Von","Bis","Dauer (h)","Dauer (dez.)"]], sum = 0, n = 0;
   list.forEach(function(iso){
     db.days[iso].jobs.forEach(function(j){
       var min = jobSec(j)/60;
       sum += min; n++;
-      rows.push([deDate(iso), j.customer, j.task, j.start, j.end, hm(min), dec(min)]);
+      rows.push([deDate(iso), j.customer, j.birth, flat(j.task), flat(j.material), j.start, j.end, hm(min), dec(min)]);
     });
   });
   if(!n) return alert("Für diesen Monat sind keine Aufträge erfasst.");
   rows.push([]);
-  rows.push(["Summe","","","","",hm(sum),dec(sum)]);
+  rows.push(["Summe","","","","","","",hm(sum),dec(sum)]);
   download("Auftraege_"+current.slice(0,7)+".csv", rows.map(function(r){ return r.map(csvCell).join(";"); }).join("\r\n"));
 }
 function exportBackup(){
