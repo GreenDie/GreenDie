@@ -204,6 +204,17 @@ tbody td{font-family:var(--mono);font-variant-numeric:tabular-nums}
 tbody td:first-child{font-family:var(--sans)}
 tfoot td{font-family:var(--mono);font-weight:700;font-variant-numeric:tabular-nums;border-top:2px solid var(--line-strong);border-bottom:0}
 tr.today td{background:var(--accent-soft)}
+tr.jump{cursor:pointer}
+tr.jump:hover td{background:var(--card-2)}
+.subhead{
+  font-family:var(--mono);font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);font-weight:600;margin:2px 0 6px
+}
+.subhead + table{margin-bottom:20px}
+th.l,td.name,.wrapcell{text-align:left}
+.wrapcell{white-space:normal;min-width:170px;max-width:300px;font-family:var(--sans)}
+td.name{font-family:var(--sans);white-space:normal;min-width:130px}
+td.name small{display:block;font-family:var(--mono);font-size:.72rem;color:var(--muted)}
 
 .tools{display:flex;gap:8px;flex-wrap:wrap}
 .foot{font-size:.78rem;color:var(--muted);text-align:center;line-height:1.6}
@@ -276,6 +287,11 @@ tr.today td{background:var(--accent-soft)}
     <div class="tablewrap" id="monthTable"></div>
   </details>
 
+  <details id="jobsBox">
+    <summary id="jobsSummary">Auftragsübersicht</summary>
+    <div class="tablewrap" id="jobsTable"></div>
+  </details>
+
   <section class="card">
     <h2>Daten</h2>
     <div class="tools">
@@ -283,7 +299,6 @@ tr.today td{background:var(--accent-soft)}
       <button class="btn" id="csvJobs" type="button">CSV: Aufträge (Monat)</button>
       <button class="btn" id="backup" type="button">Sicherung speichern</button>
       <button class="btn" id="restoreBtn" type="button">Sicherung laden</button>
-      <button class="btn" id="clearDay" type="button">Tag leeren</button>
     </div>
     <input type="file" id="restoreFile" accept="application/json,.json" hidden>
     <p class="hint">Alles bleibt auf diesem Gerät (Browser-Speicher). Sicherung regelmäßig speichern — beim Löschen der Browserdaten sind die Zeiten sonst weg.</p>
@@ -423,7 +438,7 @@ function renderAll(){
   renderJobs(d);
   renderSums();
   renderTicker();
-  renderMonth();
+  renderOverviews();
 }
 
 function renderBreaks(d){
@@ -557,6 +572,75 @@ function renderMonth(){
     '<tfoot><tr><td>'+list.length+(list.length===1?' Tag':' Tage')+'</td><td></td><td></td><td>'+hm(sumBr)+'</td><td>'+hm(sumNet)+'</td><td>'+dec(sumNet)+'</td><td>'+hm(sumJobs)+'</td></tr></tfoot></table>';
 }
 
+function renderOverviews(){ renderMonth(); renderJobsOverview(); }
+
+function renderJobsOverview(){
+  var d0 = parseISO(current);
+  $("jobsSummary").textContent = "Auftragsübersicht · " + MON[d0.getMonth()] + " " + d0.getFullYear();
+
+  var rows = [], groups = {}, keys = [], total = 0;
+  monthDays().forEach(function(iso){
+    db.days[iso].jobs.forEach(function(j){
+      var min = jobSec(j)/60;
+      total += min;
+      rows.push({ iso:iso, j:j, min:min });
+      var name = (j.customer||"").trim(), birth = (j.birth||"").trim();
+      var key = (name+"|"+birth).toLowerCase() || "|";
+      if(!groups[key]){ groups[key] = { name:name, birth:birth, min:0, count:0 }; keys.push(key); }
+      groups[key].min += min;
+      groups[key].count++;
+    });
+  });
+
+  if(!rows.length){
+    $("jobsTable").innerHTML = '<p class="empty">Für diesen Monat sind keine Aufträge erfasst.</p>';
+    return;
+  }
+
+  keys.sort(function(a,b){ return groups[b].min - groups[a].min; });
+  var perCustomer = keys.map(function(k){
+    var g = groups[k];
+    return "<tr>" +
+      '<td class="name">' + (esc(g.name) || "<em>ohne Kunde</em>") +
+        (g.birth ? "<small>"+esc(g.birth)+"</small>" : "") + "</td>" +
+      "<td>" + g.count + "</td>" +
+      "<td>" + hm(g.min) + "</td>" +
+      "<td>" + dec(g.min) + "</td></tr>";
+  }).join("");
+
+  var detail = rows.map(function(r){
+    var j = r.j, dt = parseISO(r.iso);
+    return '<tr class="jump'+(r.iso===current?" today":"")+'" data-goto="'+r.iso+'">' +
+      "<td>" + WD[dt.getDay()].slice(0,2) + ", " + pad(dt.getDate()) + "." + pad(dt.getMonth()+1) + ".</td>" +
+      '<td class="name">' + (esc(j.customer) || "–") + (j.birth ? "<small>"+esc(j.birth)+"</small>" : "") + "</td>" +
+      '<td class="wrapcell">' + (esc(flat(j.task)) || "–") + "</td>" +
+      '<td class="wrapcell">' + (esc(flat(j.material)) || "–") + "</td>" +
+      "<td>" + (j.start||"–") + "</td><td>" + (j.end||"–") + "</td>" +
+      "<td>" + (j.running ? hms(jobSec(j)) : hm(r.min)) + "</td></tr>";
+  }).join("");
+
+  $("jobsTable").innerHTML =
+    '<p class="subhead">Summe je Kunde</p>' +
+    "<table><thead><tr><th>Kunde</th><th>Einsätze</th><th>Summe</th><th>Dezimal</th></tr></thead>" +
+      "<tbody>" + perCustomer + "</tbody>" +
+      "<tfoot><tr><td>" + keys.length + (keys.length===1?" Kunde":" Kunden") + "</td><td>" + rows.length +
+        "</td><td>" + hm(total) + "</td><td>" + dec(total) + "</td></tr></tfoot></table>" +
+    '<p class="subhead">Einzelne Aufträge</p>' +
+    '<table><thead><tr><th>Tag</th><th class="l">Kunde</th><th class="l">Auftrag / Tätigkeit</th><th class="l">Material</th><th>Von</th><th>Bis</th><th>Dauer</th></tr></thead>' +
+      "<tbody>" + detail + "</tbody>" +
+      "<tfoot><tr><td>" + rows.length + (rows.length===1?" Auftrag":" Aufträge") +
+        "</td><td></td><td></td><td></td><td></td><td></td><td>" + hm(total) + "</td></tr></tfoot></table>";
+}
+
+// Klick auf eine Auftragszeile springt zum passenden Tag
+$("jobsTable").addEventListener("click", function(e){
+  var tr = e.target.closest("tr[data-goto]");
+  if(!tr) return;
+  current = tr.dataset.goto;
+  renderAll();
+  window.scrollTo({ top:0, behavior:"smooth" });
+});
+
 /* ---------------- Eingaben ---------------- */
 document.addEventListener("input", function(e){
   var el = e.target, d = day(current);
@@ -564,11 +648,11 @@ document.addEventListener("input", function(e){
   if(el.id === "date"){ if(el.value){ current = el.value; renderAll(); } return; }
   if(el.id === "note"){ d.note = el.value; save(); return; }
 
-  if(el.dataset.field){ d[el.dataset.field] = el.value; save(); renderSums(); renderMonth(); return; }
+  if(el.dataset.field){ d[el.dataset.field] = el.value; save(); renderSums(); renderOverviews(); return; }
 
   if(el.dataset.break !== undefined){
     d.breaks[+el.dataset.break][el.dataset.key] = el.value;
-    save(); renderSums(); renderMonth();
+    save(); renderSums(); renderOverviews();
     var open = d.breaks.some(function(b){ return b.from && !b.to; });
     $("pauseToggle").textContent = open ? "Pause beenden" : "Pause starten";
     $("pauseToggle").className = open ? "btn warn" : "btn";
@@ -584,7 +668,7 @@ document.addEventListener("input", function(e){
       var cell = document.querySelector('[data-dur="'+el.dataset.job+'"]');
       if(cell) cell.textContent = jobDurText(j);
     }
-    save(); renderSums(); renderTicker(); renderMonth();
+    save(); renderSums(); renderTicker(); renderOverviews();
     return;
   }
 });
@@ -628,7 +712,6 @@ document.addEventListener("click", function(e){
     case "addBreak": d.breaks.push({from:"",to:""}); save(); renderAll(); break;
     case "pauseToggle": togglePause(d); break;
     case "addJob": addJob(d); break;
-    case "clearDay": clearDay(); break;
     case "csvDays": exportDays(); break;
     case "csvJobs": exportJobs(); break;
     case "backup": exportBackup(); break;
@@ -660,11 +743,6 @@ function addJob(d){
   save(); renderAll();
   var inputs = document.querySelectorAll('#jobs [data-key="customer"]');
   if(inputs.length) inputs[inputs.length-1].focus();
-}
-function clearDay(){
-  if(!confirm("Alle Eintragungen vom "+current+" löschen?")) return;
-  delete db.days[current];
-  save(); renderAll();
 }
 
 /* ---------------- Sekundentakt ---------------- */

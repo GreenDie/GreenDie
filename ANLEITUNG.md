@@ -59,6 +59,10 @@ Pro Auftrag werden erfasst:
 Mit **‹** und **›** blätterst du durch die Tage, **Heute** springt zurück.
 Die **Monatsübersicht** listet alle erfassten Tage des angezeigten Monats mit Summe unten.
 
+Die **Auftragsübersicht** zeigt denselben Monat aus Sicht der Aufträge:
+oben die Summe je Kunde (nach Stunden sortiert, für die Abrechnung), darunter jeden
+Einsatz einzeln mit Tätigkeit und Material. Ein Klick auf eine Zeile springt zu dem Tag.
+
 - **CSV: Tage (Monat)** — Stundenzettel je Tag, mit Dezimalstunden und Monatssumme
 - **CSV: Aufträge (Monat)** — jede Auftragszeit einzeln mit Kunde, Geburtsdatum,
   Tätigkeit und Material, für die Abrechnung
