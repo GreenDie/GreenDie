@@ -768,6 +768,34 @@ document.addEventListener("input", function(e){
   }
 });
 
+// Enter in einer Listenzeile hängt direkt die nächste an
+document.addEventListener("keydown", function(e){
+  if(e.key !== "Enter" || e.shiftKey) return;
+  var el = e.target, d = day(current);
+
+  if(el.dataset.mj !== undefined){
+    e.preventDefault();
+    if(!el.value.trim()) return;           // leere Zeile nicht verdoppeln
+    var k = +el.dataset.mi;
+    d.jobs[+el.dataset.mj].materials.splice(k+1, 0, { text:"" });
+    save(); renderAll();
+    focusAt('[data-mj="'+el.dataset.mj+'"][data-mi="'+(k+1)+'"]');
+    return;
+  }
+  if(el.dataset.tj !== undefined && el.dataset.key === "text"){
+    e.preventDefault();
+    if(!el.value.trim()) return;
+    var t = +el.dataset.ti;
+    d.jobs[+el.dataset.tj].tasks.splice(t+1, 0, { text:"", time:"" });
+    save(); renderAll();
+    focusAt('[data-tj="'+el.dataset.tj+'"][data-ti="'+(t+1)+'"][data-key="text"]');
+  }
+});
+function focusAt(sel){
+  var el = document.querySelector("#jobs " + sel);
+  if(el) el.focus();
+}
+
 document.addEventListener("click", function(e){
   var el = e.target.closest("button");
   if(!el) return;

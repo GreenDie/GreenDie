@@ -55,6 +55,10 @@ Tätigkeiten und Material sind Listen statt Textfelder: jede Zeile ist ein eigen
 Eintrag, das × daneben löscht sie. Bei den Tätigkeiten stempelt **Jetzt** die Uhrzeit
 in die jeweilige Zeile.
 
+**Enter** im Textfeld hängt gleich die nächste Zeile an und springt hinein — so lässt
+sich eine Liste durchtippen, ohne zwischendurch einen Knopf zu treffen. Ist das Feld
+noch leer, passiert nichts, damit keine Leerzeilen entstehen.
+
 - **+ Auftrag** legt einen neuen Auftrag an.
 - **Start** / **Stopp** stempeln Beginn und Ende, ebenfalls auf 5 Minuten aufgerundet.
   Während der Messung läuft die Uhr rechts sekundengenau mit; beim Stopp zählt die
