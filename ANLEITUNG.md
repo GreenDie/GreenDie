@@ -22,6 +22,9 @@ einschalten (Branch auswählen, Ordner `/root`). Dann ist die App unter
 | Arbeitsende | Gehen, z. B. 17:30 |
 
 Jedes Feld lässt sich von Hand tippen oder mit **Jetzt** auf die aktuelle Uhrzeit stempeln.
+Gestempelt wird immer auf die nächsten vollen 5 Minuten aufgerundet: um 6:27 gedrückt
+ergibt 6:30, um 12:31 gedrückt ergibt 12:35. Von Hand eingetippte Zeiten bleiben
+unverändert stehen.
 Der Knopf **Pause starten** setzt den Pausenbeginn, beim zweiten Druck (**Pause beenden**)
 das Pausenende.
 
@@ -47,7 +50,9 @@ Pro Auftrag werden erfasst:
 | Beginn / Ende | Uhrzeiten, von Hand oder per Stoppuhr |
 
 - **+ Auftrag** legt einen neuen Auftrag an.
-- **Start** / **Stopp** timen die Zeit sekundengenau; rechts läuft die Uhr sichtbar mit.
+- **Start** / **Stopp** stempeln Beginn und Ende, ebenfalls auf 5 Minuten aufgerundet.
+  Während der Messung läuft die Uhr rechts sekundengenau mit; beim Stopp zählt die
+  Zeit zwischen den beiden gestempelten Zeiten.
 - Solange etwas läuft, zeigt das Band ganz oben Kunde und laufende Zeit — auch wenn du
   gerade einen anderen Tag ansiehst. Der Stopp-Knopf dort beendet die Messung von überall.
 - Es läuft immer nur ein Auftrag: startest du einen zweiten, wird der erste automatisch gestoppt.

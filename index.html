@@ -304,7 +304,8 @@ td.name small{display:block;font-family:var(--mono);font-size:.72rem;color:var(-
     <p class="hint">Alles bleibt auf diesem Gerät (Browser-Speicher). Sicherung regelmäßig speichern — beim Löschen der Browserdaten sind die Zeiten sonst weg.</p>
   </section>
 
-  <p class="foot">Zeiten in Stunden:Minuten. Über Mitternacht wird korrekt gerechnet.</p>
+  <p class="foot">Gestempelte Zeiten werden auf die nächsten 5 Minuten aufgerundet.<br>
+  Zeiten in Stunden:Minuten. Über Mitternacht wird korrekt gerechnet.</p>
 </div>
 
 <script>
@@ -345,12 +346,21 @@ function pad(n){ return String(n).padStart(2,"0"); }
 function isoOf(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
 function isoToday(){ return isoOf(new Date()); }
 function parseISO(s){ var p = s.split("-"); return new Date(+p[0], +p[1]-1, +p[2]); }
-function nowHM(){ var d=new Date(); return pad(d.getHours())+":"+pad(d.getMinutes()); }
+var RASTER = 5;                            // Stempelzeiten auf 5 Minuten aufrunden
+function nowHM(){
+  var d = new Date();
+  var m = Math.ceil((d.getHours()*60 + d.getMinutes()) / RASTER) * RASTER;
+  return fromMin(m);
+}
 function toMin(s){
   if(!s || !/^\d{1,2}:\d{2}$/.test(s)) return null;
   var p = s.split(":"), h = +p[0], m = +p[1];
   if(h>23 || m>59) return null;
   return h*60+m;
+}
+function fromMin(m){                       // 390 -> "06:30", 1440 -> "00:00"
+  m = ((Math.round(m) % 1440) + 1440) % 1440;
+  return pad(Math.floor(m/60)) + ":" + pad(m%60);
 }
 function span(a,b){                       // Minuten von a bis b, über Mitternacht hinweg
   if(a===null || b===null) return null;
@@ -416,8 +426,8 @@ function stopAllRunning(){
   while((r = runningJob())) finishJob(r.job);
 }
 function finishJob(j){
-  j.sec = Math.round((Date.now() - j.startedAt)/1000);
   j.end = nowHM();
+  delete j.sec;                            // Dauer folgt den gerundeten Zeiten
   j.running = false;
   j.startedAt = null;
 }
