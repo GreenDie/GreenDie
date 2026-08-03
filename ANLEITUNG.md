@@ -48,7 +48,7 @@ Pro Auftrag werden erfasst:
 | Heimfahrt | Dauer der Rückfahrt in Minuten, z. B. 25 |
 | Tätigkeiten | Liste — jede Zeile mit eigener Uhrzeit, **+ Tätigkeit** hängt eine an |
 | Material | Liste — eine Zeile je Teil, **+ Material** hängt eine an |
-| Dauer | wird gerechnet: Ankunft bis Abfahrt |
+| Dauer | wird gerechnet: Ankunft bis Abfahrt, abzüglich Pause |
 
 Die vier Fahrtfelder stehen als Block zusammen: oben Ankunft und Anfahrt,
 darunter Abfahrt und Heimfahrt. Die Dauer beim Kunden steht in der Kopfzeile der Karte.
@@ -67,6 +67,12 @@ noch leer, passiert nichts, damit keine Leerzeilen entstehen.
 **+ Auftrag** legt einen neuen Auftrag an, das × in der Kopfzeile der Karte löscht ihn
 nach Rückfrage. Die Dauer rechnet sich laufend aus Ankunft und Abfahrt und fließt in
 die Summe **Auf Aufträge** oben ein.
+
+Fällt eine Pause in diesen Zeitraum, wird sie zeitlich genau abgezogen: bei einem
+Auftrag von 12:00 bis 14:00 und Pause von 12:30 bis 13:00 stehen 1:30 in der Dauer,
+mit dem Hinweis „− 0:30 Pause" daneben. Ragt die Pause nur teilweise hinein, zählt
+auch nur der überlappende Teil. Bei mehreren Pausen werden alle Überschneidungen
+berücksichtigt, ebenso über Mitternacht hinweg.
 
 ## Tage, Monat, Export
 

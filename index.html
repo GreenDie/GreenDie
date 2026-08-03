@@ -150,8 +150,10 @@ input[type=time]:focus-visible,input[type=date]:focus-visible,input[type=text]:f
   color:var(--muted);font-weight:600
 }
 .hdur{
-  font-family:var(--mono);font-size:.63rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)
+  font-family:var(--mono);font-size:.63rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  display:flex;align-items:baseline;gap:8px
 }
+.hdur i{font-style:normal;color:var(--accent);white-space:nowrap}
 .hdur b{
   font-size:.95rem;letter-spacing:0;color:var(--ink);margin-left:5px;
   font-variant-numeric:tabular-nums
@@ -452,10 +454,30 @@ function isEmptyDay(d){
   if(d.jobs.length) return false;
   return !d.breaks.some(function(b){ return b.from || b.to; });
 }
-function jobMin(j){                        // Zeit beim Kunden: Ankunft bis Abfahrt
-  var s = span(toMin(j.arrival), toMin(j.depart));
-  return s === null ? 0 : s;
+// Alle Zeiten des Tages auf eine durchlaufende Achse ab Arbeitsbeginn legen,
+// damit Schichten über Mitternacht richtig verglichen werden.
+function achse(min, base){
+  if(min === null) return null;
+  return min < base ? min + 1440 : min;
 }
+function jobParts(j, d){                   // brutto, davon Pause, netto — in Minuten
+  var base = toMin(d.start);
+  if(base === null) base = 0;
+  var a = achse(toMin(j.arrival), base), b = achse(toMin(j.depart), base);
+  if(a === null || b === null) return { brutto:0, pause:0, netto:0 };
+  if(b < a) b += 1440;
+  var pause = 0;
+  d.breaks.forEach(function(br){
+    var s = achse(toMin(br.from), base), e = achse(toMin(br.to), base);
+    if(s === null || e === null) return;
+    if(e < s) e += 1440;
+    var ueber = Math.min(b, e) - Math.max(a, s);   // Überschneidung mit dem Auftrag
+    if(ueber > 0) pause += ueber;
+  });
+  if(pause > b - a) pause = b - a;
+  return { brutto:b - a, pause:pause, netto:b - a - pause };
+}
+function jobMin(j, d){ return jobParts(j, d).netto; }
 function totals(d){
   var att = span(toMin(d.start), toMin(d.end));
   var br = 0;
@@ -465,7 +487,7 @@ function totals(d){
   });
   var net = att===null ? null : Math.max(0, att-br);
   var jm = 0;
-  d.jobs.forEach(function(j){ jm += jobMin(j); });
+  d.jobs.forEach(function(j){ jm += jobMin(j, d); });
   return { att:att, br:br, net:net, jobs:jm };
 }
 
@@ -522,7 +544,8 @@ function renderJobs(d){
     el.className = "job";
     el.innerHTML =
       '<div class="jhead"><span>Auftrag ' + (i+1) + '</span>' +
-        '<span class="hdur">Dauer <b class="dur" data-dur="'+i+'">'+jobDurText(j)+'</b></span>' +
+        '<span class="hdur"><i data-dpause="'+i+'">'+jobPauseText(j, d)+'</i>' +
+          'Dauer <b class="dur" data-dur="'+i+'">'+jobDurText(j, d)+'</b></span>' +
         '<button class="icon" type="button" data-deljob="'+i+'" title="Auftrag löschen" aria-label="Auftrag löschen">×</button></div>' +
       '<div class="jfields">' +
         '<div class="names">' +
@@ -573,9 +596,19 @@ function renderJobs(d){
     box.appendChild(el);
   });
 }
-function jobDurText(j){
-  var min = jobMin(j);
-  return min > 0 ? hm(min) : "–";
+function jobDurText(j, d){
+  var p = jobParts(j, d);
+  return p.brutto > 0 ? hm(p.netto) : "–";   // ganz in der Pause -> 0:00, nicht "–"
+}
+function jobPauseText(j, d){
+  var p = jobParts(j, d);
+  return p.pause > 0 ? "− " + hm(p.pause) + " Pause" : "";
+}
+function refreshDur(i, j, d){
+  var cell = document.querySelector('[data-dur="'+i+'"]');
+  if(cell) cell.textContent = jobDurText(j, d);
+  var note = document.querySelector('[data-dpause="'+i+'"]');
+  if(note) note.textContent = jobPauseText(j, d);
 }
 
 function renderSums(){
@@ -685,10 +718,16 @@ document.addEventListener("input", function(e){
   if(el.id === "date"){ if(el.value){ current = el.value; renderAll(); } return; }
   if(el.id === "note"){ d.note = el.value; save(); return; }
 
-  if(el.dataset.field){ d[el.dataset.field] = el.value; save(); renderSums(); renderOverviews(); return; }
+  if(el.dataset.field){
+    d[el.dataset.field] = el.value;
+    d.jobs.forEach(function(j, i){ refreshDur(i, j, d); });
+    save(); renderSums(); renderOverviews();
+    return;
+  }
 
   if(el.dataset.break !== undefined){
     d.breaks[+el.dataset.break][el.dataset.key] = el.value;
+    d.jobs.forEach(function(j, i){ refreshDur(i, j, d); });
     save(); renderSums(); renderOverviews();
     return;
   }
@@ -707,8 +746,7 @@ document.addEventListener("input", function(e){
   if(el.dataset.job !== undefined){
     var j = d.jobs[+el.dataset.job], k = el.dataset.key;
     j[k] = el.value;
-    var cell = document.querySelector('[data-dur="'+el.dataset.job+'"]');
-    if(cell) cell.textContent = jobDurText(j);
+    refreshDur(+el.dataset.job, j, d);
     save(); renderSums(); renderOverviews();
     return;
   }
@@ -879,7 +917,7 @@ function exportJobs(){
   var list = monthDays(), rows = [["Datum","Kunde","Geburtsdatum","Ankunft","Anfahrt (Min.)","Abfahrt","Heimfahrt (Min.)","Tätigkeiten","Material","Dauer (h)","Dauer (dez.)"]], sum = 0, n = 0;
   list.forEach(function(iso){
     db.days[iso].jobs.forEach(function(j){
-      var min = jobMin(j);
+      var min = jobMin(j, db.days[iso]);
       sum += min; n++;
       rows.push([deDate(iso), j.customer, j.birth, j.arrival, j.travel, j.depart, j.home,
                  jobTasks(j).map(taskLabel).join(" · "),
