@@ -42,13 +42,16 @@ Pro Auftrag werden erfasst:
 |---|---|
 | Kunde | Name |
 | Geburtsdatum | z. B. 04.09.1958 |
-| Abfahrt | Uhrzeit, wann du losgefahren bist |
-| Ankunft | Uhrzeit beim Kunden |
-| Anfahrt | Fahrzeit in Minuten, z. B. 20 |
+| Ankunft | Uhrzeit, wann du beim Kunden warst |
+| Anfahrt | Dauer der Hinfahrt in Minuten, z. B. 20 |
+| Abfahrt | Uhrzeit, wann du beim Kunden losgefahren bist |
+| Heimfahrt | Dauer der Rückfahrt in Minuten, z. B. 25 |
 | Tätigkeiten | Liste — jede Zeile mit eigener Uhrzeit, **+ Tätigkeit** hängt eine an |
 | Material | Liste — eine Zeile je Teil, **+ Material** hängt eine an |
-| Heimfahrt | Uhrzeit, wann du beim Kunden losgefahren bist |
-| Dauer | wird gerechnet: Ankunft bis Heimfahrt |
+| Dauer | wird gerechnet: Ankunft bis Abfahrt |
+
+Die vier Fahrtfelder stehen als Block zusammen: oben Ankunft und Anfahrt,
+darunter Abfahrt und Heimfahrt. Die Dauer beim Kunden steht in der Kopfzeile der Karte.
 
 Tätigkeiten und Material sind Listen statt Textfelder: jede Zeile ist ein eigener
 Eintrag, das × daneben löscht sie.
@@ -62,22 +65,23 @@ sich eine Liste durchtippen, ohne zwischendurch einen Knopf zu treffen. Ist das 
 noch leer, passiert nichts, damit keine Leerzeilen entstehen.
 
 **+ Auftrag** legt einen neuen Auftrag an, das × in der Kopfzeile der Karte löscht ihn
-nach Rückfrage. Die Dauer unten rechts rechnet sich laufend aus Ankunft und Heimfahrt
-und fließt in die Summe **Auf Aufträge** oben ein.
+nach Rückfrage. Die Dauer rechnet sich laufend aus Ankunft und Abfahrt und fließt in
+die Summe **Auf Aufträge** oben ein.
 
 ## Tage, Monat, Export
 
 Mit **‹** und **›** blätterst du durch die Tage, **Heute** springt zurück.
 Die **Monatsübersicht** listet alle erfassten Tage des angezeigten Monats mit Summe unten.
 
-Die **Auftragsübersicht** listet die Aufträge des Monats mit Kunde, Ankunft, Anfahrt
-und allen Tätigkeiten samt Uhrzeiten; unten steht die gesamte Anfahrtszeit.
+Die **Auftragsübersicht** listet die Aufträge des Monats mit Kunde, Ankunft, Anfahrt,
+Abfahrt, Heimfahrt und allen Tätigkeiten samt Uhrzeiten; unten steht die gesamte
+Fahrzeit des Monats (Hin- und Rückfahrten zusammen).
 Ein Klick auf eine Zeile springt zu dem Tag. Auf dem Handy wird daraus je Auftrag
 eine Karte, damit nichts seitlich aus dem Bild läuft.
 
 - **CSV: Tage (Monat)** — Stundenzettel je Tag, mit Dezimalstunden und Monatssumme
-- **CSV: Aufträge (Monat)** — jeder Auftrag einzeln mit Kunde, Geburtsdatum, Abfahrt,
-  Ankunft, Anfahrt, Tätigkeiten, Material, Heimfahrt und Dauer
+- **CSV: Aufträge (Monat)** — jeder Auftrag einzeln mit Kunde, Geburtsdatum, Ankunft,
+  Anfahrt, Abfahrt, Heimfahrt, Tätigkeiten, Material und Dauer
 - **Sicherung speichern / laden** — alle Daten als JSON-Datei
 
 Die CSV-Dateien sind mit Semikolon getrennt und haben Komma als Dezimaltrennzeichen,

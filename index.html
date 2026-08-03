@@ -139,17 +139,23 @@ input[type=time]:focus-visible,input[type=date]:focus-visible,input[type=text]:f
 .field{flex:0 0 auto;min-width:0;display:flex;flex-direction:column;gap:3px}
 .names .field{flex:1 1 180px}
 .names .field.birth{flex:0 1 152px}
-.names .field.mini{flex:0 1 128px}
-.names .field.time{flex:1 1 132px}
+.names .field.mini{flex:1 1 96px}
+.names .field.time{flex:2 1 140px}
 .jhead{
-  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  display:flex;align-items:center;gap:8px;
   margin-bottom:9px;padding-bottom:7px;border-bottom:1px dashed var(--line)
 }
-.jhead span{
-  font-family:var(--mono);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;
+.jhead > span:first-child{
+  flex:1;font-family:var(--mono);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;
   color:var(--muted);font-weight:600
 }
-.jfoot{align-items:flex-end}
+.hdur{
+  font-family:var(--mono);font-size:.63rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)
+}
+.hdur b{
+  font-size:.95rem;letter-spacing:0;color:var(--ink);margin-left:5px;
+  font-variant-numeric:tabular-nums
+}
 .field span{font-family:var(--mono);font-size:.63rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .field input,.field textarea{
   font:inherit;font-size:.95rem;background:var(--card);color:var(--ink);
@@ -178,11 +184,7 @@ input[type=time]:focus-visible,input[type=date]:focus-visible,input[type=text]:f
   border-radius:var(--r);padding:6px 11px
 }
 .addmini:hover{border-style:solid;border-color:var(--accent);color:var(--accent)}
-.dur{
-  font-family:var(--mono);font-size:1.05rem;font-weight:600;font-variant-numeric:tabular-nums;
-  padding:8px 9px;border-radius:var(--r);background:var(--card);border:1px solid var(--line);
-  text-align:center
-}
+
 .empty{color:var(--muted);font-size:.9rem;padding:6px 0 12px}
 
 
@@ -420,19 +422,25 @@ function migrateJob(j){
     delete j.material;
   }
   if(j.arrival === undefined) j.arrival = "";
+  if(!j.arrival && j.start) j.arrival = j.start;   // ganz frühe Von/Bis-Zeiten
+  if(j.v !== 2){
+    // Bis hierher hieß "home" die Abfahrtszeit beim Kunden – das ist jetzt "depart".
+    j.depart = /^\d{1,2}:\d{2}$/.test(j.home || "") ? j.home : (j.end || "");
+    j.home = "";                                   // Heimfahrt ist jetzt eine Dauer
+    j.v = 2;
+  }
+  if(j.travel === undefined) j.travel = "";
   if(j.depart === undefined) j.depart = "";
-  if(j.home === undefined) j.home = j.end || "";   // frühere Von/Bis-Zeiten übernehmen
-  if(!j.arrival && j.start) j.arrival = j.start;
+  if(j.home === undefined) j.home = "";
   delete j.start; delete j.end;
   if(j.running || j.startedAt){ j.running = false; j.startedAt = null; }
   if(j.sec !== undefined) delete j.sec;      // Dauer kommt jetzt aus Von/Bis
-  if(j.travel === undefined) j.travel = "";
 }
 function lines(s){
   return String(s||"").split("\n").map(function(t){ return t.trim(); }).filter(Boolean);
 }
 function newJob(){
-  return { customer:"", birth:"", depart:"", arrival:"", travel:"", home:"",
+  return { customer:"", birth:"", arrival:"", travel:"", depart:"", home:"", v:2,
            tasks:[{text:"",time:vorschlagszeit()}], materials:[{text:""}] };
 }
 function jobTasks(j){ return (j.tasks||[]).filter(function(t){ return (t.text||"").trim(); }); }
@@ -444,8 +452,8 @@ function isEmptyDay(d){
   if(d.jobs.length) return false;
   return !d.breaks.some(function(b){ return b.from || b.to; });
 }
-function jobMin(j){                        // Zeit beim Kunden: Ankunft bis Heimfahrt
-  var s = span(toMin(j.arrival), toMin(j.home));
+function jobMin(j){                        // Zeit beim Kunden: Ankunft bis Abfahrt
+  var s = span(toMin(j.arrival), toMin(j.depart));
   return s === null ? 0 : s;
 }
 function totals(d){
@@ -514,6 +522,7 @@ function renderJobs(d){
     el.className = "job";
     el.innerHTML =
       '<div class="jhead"><span>Auftrag ' + (i+1) + '</span>' +
+        '<span class="hdur">Dauer <b class="dur" data-dur="'+i+'">'+jobDurText(j)+'</b></span>' +
         '<button class="icon" type="button" data-deljob="'+i+'" title="Auftrag löschen" aria-label="Auftrag löschen">×</button></div>' +
       '<div class="jfields">' +
         '<div class="names">' +
@@ -523,12 +532,16 @@ function renderJobs(d){
             '<input type="text" data-job="'+i+'" data-key="birth" value="'+esc(j.birth)+'" placeholder="TT.MM.JJJJ" inputmode="numeric"></label>' +
         '</div>' +
         '<div class="names">' +
-          '<label class="field time"><span>Abfahrt</span>' +
-            '<input type="time" data-job="'+i+'" data-key="depart" value="'+(j.depart||"")+'" aria-label="Abfahrt"></label>' +
           '<label class="field time"><span>Ankunft</span>' +
             '<input type="time" data-job="'+i+'" data-key="arrival" value="'+(j.arrival||"")+'" aria-label="Ankunft beim Kunden"></label>' +
           '<label class="field mini"><span>Anfahrt (Min.)</span>' +
-            '<input type="text" data-job="'+i+'" data-key="travel" value="'+esc(j.travel)+'" placeholder="z. B. 20" inputmode="numeric"></label>' +
+            '<input type="text" data-job="'+i+'" data-key="travel" value="'+esc(j.travel)+'" placeholder="20" inputmode="numeric"></label>' +
+        '</div>' +
+        '<div class="names">' +
+          '<label class="field time"><span>Abfahrt</span>' +
+            '<input type="time" data-job="'+i+'" data-key="depart" value="'+(j.depart||"")+'" aria-label="Abfahrt beim Kunden"></label>' +
+          '<label class="field mini"><span>Heimfahrt (Min.)</span>' +
+            '<input type="text" data-job="'+i+'" data-key="home" value="'+esc(j.home)+'" placeholder="25" inputmode="numeric"></label>' +
         '</div>' +
         '<div class="field"><span>Tätigkeiten</span><div class="list">' +
           j.tasks.map(function(t,k){
@@ -556,12 +569,7 @@ function renderJobs(d){
           '<button class="addmini" type="button" data-addmat="'+i+'">+ Material</button>' +
         '</div></div>' +
       '</div>' +
-      '<div class="names jfoot">' +
-        '<label class="field time"><span>Heimfahrt</span>' +
-          '<input type="time" data-job="'+i+'" data-key="home" value="'+(j.home||"")+'" aria-label="Heimfahrt"></label>' +
-        '<div class="field mini"><span>Dauer</span>' +
-          '<span class="dur" data-dur="'+i+'">'+jobDurText(j)+'</span></div>' +
-      '</div>';
+      '';
     box.appendChild(el);
   });
 }
@@ -628,7 +636,7 @@ function renderJobsOverview(){
   monthDays().forEach(function(iso){
     db.days[iso].jobs.forEach(function(j){
       rows.push({ iso:iso, j:j });
-      travelSum += parseInt(j.travel, 10) || 0;
+      travelSum += (parseInt(j.travel,10) || 0) + (parseInt(j.home,10) || 0);
     });
   });
 
@@ -644,6 +652,8 @@ function renderJobsOverview(){
       '<td class="name" data-l="Kunde">' + (esc(j.customer) || "–") + (j.birth ? "<small>"+esc(j.birth)+"</small>" : "") + "</td>" +
       '<td data-l="Ankunft">' + (j.arrival || "–") + "</td>" +
       '<td data-l="Anfahrt">' + (j.travel ? esc(j.travel) + " Min." : "–") + "</td>" +
+      '<td data-l="Abfahrt">' + (j.depart || "–") + "</td>" +
+      '<td data-l="Heimfahrt">' + (j.home ? esc(j.home) + " Min." : "–") + "</td>" +
       '<td class="wrapcell" data-l="Tätigkeit">' + (ts.length
           ? '<ul class="tlist">' + ts.map(function(t){
               return "<li>" + (t.time ? '<b>'+t.time+'</b> ' : "") + esc(t.text) + "</li>";
@@ -652,11 +662,11 @@ function renderJobsOverview(){
   }).join("");
 
   $("jobsTable").innerHTML =
-    '<table><thead><tr><th>Tag</th><th class="l">Kunde</th><th>Ankunft</th><th>Anfahrt</th><th class="l">Tätigkeiten</th></tr></thead>' +
+    '<table><thead><tr><th>Tag</th><th class="l">Kunde</th><th>Ankunft</th><th>Anfahrt</th><th>Abfahrt</th><th>Heimfahrt</th><th class="l">Tätigkeiten</th></tr></thead>' +
       "<tbody>" + body + "</tbody>" +
       '<tfoot><tr><td data-l="Gesamt">' + rows.length + (rows.length===1?" Auftrag":" Aufträge") +
-        "</td><td></td><td></td>" + '<td data-l="Anfahrt">' + (travelSum ? travelSum + " Min." : "–") +
-        "</td><td></td></tr></tfoot></table>";
+        "</td><td></td>" + '<td data-l="Fahrzeit">' + (travelSum ? travelSum + " Min." : "–") +
+        "</td><td></td><td></td><td></td></tr></tfoot></table>";
 }
 
 // Klick auf eine Auftragszeile springt zum passenden Tag
@@ -866,15 +876,15 @@ function exportDays(){
   download("Zeiterfassung_"+current.slice(0,7)+".csv", rows.map(function(r){ return r.map(csvCell).join(";"); }).join("\r\n"));
 }
 function exportJobs(){
-  var list = monthDays(), rows = [["Datum","Kunde","Geburtsdatum","Abfahrt","Ankunft","Anfahrt (Min.)","Tätigkeiten","Material","Heimfahrt","Dauer (h)","Dauer (dez.)"]], sum = 0, n = 0;
+  var list = monthDays(), rows = [["Datum","Kunde","Geburtsdatum","Ankunft","Anfahrt (Min.)","Abfahrt","Heimfahrt (Min.)","Tätigkeiten","Material","Dauer (h)","Dauer (dez.)"]], sum = 0, n = 0;
   list.forEach(function(iso){
     db.days[iso].jobs.forEach(function(j){
       var min = jobMin(j);
       sum += min; n++;
-      rows.push([deDate(iso), j.customer, j.birth, j.depart, j.arrival, j.travel,
+      rows.push([deDate(iso), j.customer, j.birth, j.arrival, j.travel, j.depart, j.home,
                  jobTasks(j).map(taskLabel).join(" · "),
                  jobMaterials(j).map(function(m){ return m.text; }).join(" · "),
-                 j.home, hm(min), dec(min)]);
+                 hm(min), dec(min)]);
     });
   });
   if(!n) return alert("Für diesen Monat sind keine Aufträge erfasst.");
