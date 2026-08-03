@@ -21,12 +21,9 @@ einschalten (Branch auswählen, Ordner `/root`). Dann ist die App unter
 | Pause von / bis | z. B. 12:30 bis 13:00 — beliebig viele Pausen über **+ Pause** |
 | Arbeitsende | Gehen, z. B. 17:30 |
 
-Jedes Feld lässt sich von Hand tippen oder mit **Jetzt** auf die aktuelle Uhrzeit stempeln.
-Gestempelt wird immer auf die nächsten vollen 5 Minuten aufgerundet: um 6:27 gedrückt
-ergibt 6:30, um 12:31 gedrückt ergibt 12:35. Von Hand eingetippte Zeiten bleiben
-unverändert stehen.
-Der Knopf **Pause starten** setzt den Pausenbeginn, beim zweiten Druck (**Pause beenden**)
-das Pausenende.
+Zeiten werden direkt im Uhrfeld gewählt oder getippt. Jede bestätigte Uhrzeit wird auf
+die nächsten vollen 5 Minuten aufgerundet: aus 6:27 wird 6:30, aus 12:31 wird 12:35.
+Das gilt in allen Uhrfeldern der App.
 
 Oben stehen laufend die Summen:
 
@@ -45,29 +42,28 @@ Pro Auftrag werden erfasst:
 |---|---|
 | Kunde | Name |
 | Geburtsdatum | z. B. 04.09.1958 |
-| Ankunft | Uhrzeit beim Kunden, per **Jetzt** stempelbar |
+| Abfahrt | Uhrzeit, wann du losgefahren bist |
+| Ankunft | Uhrzeit beim Kunden |
 | Anfahrt | Fahrzeit in Minuten, z. B. 20 |
 | Tätigkeiten | Liste — jede Zeile mit eigener Uhrzeit, **+ Tätigkeit** hängt eine an |
 | Material | Liste — eine Zeile je Teil, **+ Material** hängt eine an |
-| Beginn / Ende | Uhrzeiten, von Hand oder per Stoppuhr |
+| Heimfahrt | Uhrzeit, wann du beim Kunden losgefahren bist |
+| Dauer | wird gerechnet: Ankunft bis Heimfahrt |
 
 Tätigkeiten und Material sind Listen statt Textfelder: jede Zeile ist ein eigener
-Eintrag, das × daneben löscht sie. Bei den Tätigkeiten stempelt **Jetzt** die Uhrzeit
-in die jeweilige Zeile.
+Eintrag, das × daneben löscht sie.
+
+Die Uhrzeit einer neuen Tätigkeit ist mit **einer Stunde Vorlauf** vorbelegt: legst du
+um 9:07 eine an, steht dort 10:10. Mit **−15** und **+15** links und rechts vom Uhrfeld
+schiebst du sie in Viertelstundenschritten zurecht, ohne den Zeitwähler zu öffnen.
 
 **Enter** im Textfeld hängt gleich die nächste Zeile an und springt hinein — so lässt
 sich eine Liste durchtippen, ohne zwischendurch einen Knopf zu treffen. Ist das Feld
 noch leer, passiert nichts, damit keine Leerzeilen entstehen.
 
-- **+ Auftrag** legt einen neuen Auftrag an.
-- **Start** / **Stopp** stempeln Beginn und Ende, ebenfalls auf 5 Minuten aufgerundet.
-  Während der Messung läuft die Uhr rechts sekundengenau mit; beim Stopp zählt die
-  Zeit zwischen den beiden gestempelten Zeiten.
-- Solange etwas läuft, zeigt das Band ganz oben Kunde und laufende Zeit — auch wenn du
-  gerade einen anderen Tag ansiehst. Der Stopp-Knopf dort beendet die Messung von überall.
-- Es läuft immer nur ein Auftrag: startest du einen zweiten, wird der erste automatisch gestoppt.
-- Der allererste Start am Tag stempelt den Arbeitsbeginn mit, falls er noch leer ist.
-- Zeiten lassen sich jederzeit von Hand nachbessern — dann zählt die eingetippte Zeit.
+**+ Auftrag** legt einen neuen Auftrag an, das × in der Kopfzeile der Karte löscht ihn
+nach Rückfrage. Die Dauer unten rechts rechnet sich laufend aus Ankunft und Heimfahrt
+und fließt in die Summe **Auf Aufträge** oben ein.
 
 ## Tage, Monat, Export
 
@@ -80,8 +76,8 @@ Ein Klick auf eine Zeile springt zu dem Tag. Auf dem Handy wird daraus je Auftra
 eine Karte, damit nichts seitlich aus dem Bild läuft.
 
 - **CSV: Tage (Monat)** — Stundenzettel je Tag, mit Dezimalstunden und Monatssumme
-- **CSV: Aufträge (Monat)** — jede Auftragszeit einzeln mit Kunde, Geburtsdatum,
-  Tätigkeit und Material, für die Abrechnung
+- **CSV: Aufträge (Monat)** — jeder Auftrag einzeln mit Kunde, Geburtsdatum, Abfahrt,
+  Ankunft, Anfahrt, Tätigkeiten, Material, Heimfahrt und Dauer
 - **Sicherung speichern / laden** — alle Daten als JSON-Datei
 
 Die CSV-Dateien sind mit Semikolon getrennt und haben Komma als Dezimaltrennzeichen,

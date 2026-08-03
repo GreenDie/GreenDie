@@ -14,7 +14,6 @@
   --bg:#E9ECE8; --card:#FBFCFA; --card-2:#F2F5F1;
   --ink:#14201C; --muted:#5C6B65; --line:#CBD3CE; --line-strong:#9FACA6;
   --accent:#0E6E62; --accent-ink:#FFFFFF; --accent-soft:#D9E8E4;
-  --run:#9A5B08; --run-soft:#F6E6CB;
   --danger:#A8392B;
   --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   --mono:ui-monospace,"SF Mono","Cascadia Mono","Segoe UI Mono",Menlo,Consolas,monospace;
@@ -25,7 +24,6 @@
     --bg:#0E1513; --card:#17211E; --card-2:#1E2A26;
     --ink:#E7EDE9; --muted:#94A39C; --line:#2A3833; --line-strong:#3D4F49;
     --accent:#4CBFAC; --accent-ink:#07211D; --accent-soft:#1D3733;
-    --run:#E4A44B; --run-soft:#3A2C13;
     --danger:#E08479;
   }
 }
@@ -33,14 +31,12 @@
   --bg:#0E1513; --card:#17211E; --card-2:#1E2A26;
   --ink:#E7EDE9; --muted:#94A39C; --line:#2A3833; --line-strong:#3D4F49;
   --accent:#4CBFAC; --accent-ink:#07211D; --accent-soft:#1D3733;
-  --run:#E4A44B; --run-soft:#3A2C13;
   --danger:#E08479;
 }
 :root[data-theme="light"]{
   --bg:#E9ECE8; --card:#FBFCFA; --card-2:#F2F5F1;
   --ink:#14201C; --muted:#5C6B65; --line:#CBD3CE; --line-strong:#9FACA6;
   --accent:#0E6E62; --accent-ink:#FFFFFF; --accent-soft:#D9E8E4;
-  --run:#9A5B08; --run-soft:#F6E6CB;
   --danger:#A8392B;
 }
 
@@ -105,12 +101,6 @@ input[type=time]{
 input[type=time]:focus-visible,input[type=date]:focus-visible,input[type=text]:focus-visible,textarea:focus-visible,button:focus-visible{
   outline:2px solid var(--accent);outline-offset:2px
 }
-.now{
-  flex:0 0 auto;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;
-  background:var(--card-2);color:var(--muted);border:1px solid var(--line);border-radius:var(--r);
-  padding:8px 9px;cursor:pointer
-}
-.now:hover{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
 
 /* Pausen */
 .pause-row{display:flex;align-items:center;gap:8px 10px;padding:8px 0;border-bottom:1px dashed var(--line);flex-wrap:wrap}
@@ -119,7 +109,6 @@ input[type=time]:focus-visible,input[type=date]:focus-visible,input[type=text]:f
 .pgrp{display:flex;align-items:center;gap:6px}
 .pgrp > span{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);width:24px}
 .pause-row .icon{margin-left:auto}
-.sep{color:var(--muted);font-family:var(--mono)}
 .icon{
   flex:0 0 auto;width:32px;height:32px;border:1px solid var(--line);background:var(--card-2);
   color:var(--muted);border-radius:var(--r);cursor:pointer;font-size:1rem;line-height:1
@@ -133,7 +122,6 @@ input[type=time]:focus-visible,input[type=date]:focus-visible,input[type=text]:f
 .btn:hover{border-color:var(--line-strong)}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .btn.primary:hover{filter:brightness(1.08)}
-.btn.warn{background:var(--run-soft);border-color:var(--run);color:var(--run)}
 
 /* ---------- Summen ---------- */
 .sums{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
@@ -146,13 +134,22 @@ input[type=time]:focus-visible,input[type=date]:focus-visible,input[type=text]:f
 
 /* ---------- Aufträge ---------- */
 .job{border:1px solid var(--line);border-radius:var(--r);padding:10px;margin-bottom:10px;background:var(--card-2)}
-.job.running{border-color:var(--run);box-shadow:inset 3px 0 0 var(--run)}
 .jfields{display:flex;flex-direction:column;gap:9px;margin-bottom:10px}
 .job .names{display:flex;gap:8px;flex-wrap:wrap}
 .field{flex:0 0 auto;min-width:0;display:flex;flex-direction:column;gap:3px}
 .names .field{flex:1 1 180px}
 .names .field.birth{flex:0 1 152px}
 .names .field.mini{flex:0 1 128px}
+.names .field.time{flex:1 1 132px}
+.jhead{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  margin-bottom:9px;padding-bottom:7px;border-bottom:1px dashed var(--line)
+}
+.jhead span{
+  font-family:var(--mono);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);font-weight:600
+}
+.jfoot{align-items:flex-end}
 .field span{font-family:var(--mono);font-size:.63rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .field input,.field textarea{
   font:inherit;font-size:.95rem;background:var(--card);color:var(--ink);
@@ -160,8 +157,7 @@ input[type=time]:focus-visible,input[type=date]:focus-visible,input[type=text]:f
 }
 .field textarea{min-height:62px;resize:vertical;line-height:1.4}
 .field.birth input,.field.mini input{font-family:var(--mono);font-variant-numeric:tabular-nums}
-.inl{display:flex;gap:6px;align-items:center}
-.inl input[type=time]{flex:1 1 auto;font-size:1.05rem;min-width:100px;background:var(--card)}
+.field input[type=time]{font-size:1.05rem;background:var(--card);text-align:left}
 
 /* Ergänzende Listen (Tätigkeiten, Material) */
 .list{display:flex;flex-direction:column;gap:6px;min-width:0}
@@ -169,36 +165,26 @@ input[type=time]:focus-visible,input[type=date]:focus-visible,input[type=text]:f
 .litem input[type=text]{flex:1 1 150px;width:auto;min-width:0}
 .lrow{display:flex;gap:6px;align-items:center;flex:0 0 auto;margin-left:auto}
 .litem input[type=time]{flex:0 0 auto;width:auto;font-size:.95rem;min-width:104px;padding:6px 4px;background:var(--card)}
-.litem .now{padding:7px 8px;font-size:.65rem}
 .litem .icon{width:28px;height:28px;font-size:.9rem}
+.step{
+  flex:0 0 auto;font-family:var(--mono);font-size:.72rem;font-weight:600;cursor:pointer;
+  background:var(--card-2);color:var(--muted);border:1px solid var(--line);
+  border-radius:var(--r);padding:7px 6px;min-width:38px
+}
+.step:hover{border-color:var(--accent);color:var(--accent)}
 .addmini{
   align-self:flex-start;font:inherit;font-size:.76rem;font-weight:600;cursor:pointer;
   background:none;border:1px dashed var(--line-strong);color:var(--muted);
   border-radius:var(--r);padding:6px 11px
 }
 .addmini:hover{border-style:solid;border-color:var(--accent);color:var(--accent)}
-.job .times{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.job .times input[type=time]{font-size:1.05rem;min-width:92px;background:var(--card)}
 .dur{
-  font-family:var(--mono);font-size:1.15rem;font-weight:600;font-variant-numeric:tabular-nums;
-  margin-left:auto;padding:4px 9px;border-radius:var(--r);background:var(--card);border:1px solid var(--line)
+  font-family:var(--mono);font-size:1.05rem;font-weight:600;font-variant-numeric:tabular-nums;
+  padding:8px 9px;border-radius:var(--r);background:var(--card);border:1px solid var(--line);
+  text-align:center
 }
-.job.running .dur{background:var(--run-soft);border-color:var(--run);color:var(--run)}
-.job .times .btn{margin-left:0}
 .empty{color:var(--muted);font-size:.9rem;padding:6px 0 12px}
 
-/* Laufband */
-.ticker{
-  position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:10px;
-  background:var(--run-soft);border:1px solid var(--run);color:var(--run);
-  border-radius:var(--r);padding:9px 11px;font-size:.85rem
-}
-.ticker .dot{width:9px;height:9px;border-radius:50%;background:var(--run);flex:0 0 auto}
-@media (prefers-reduced-motion:no-preference){ .ticker .dot{animation:pulse 1.6s ease-in-out infinite} }
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
-.ticker .who{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;color:var(--ink)}
-.ticker .t{font-family:var(--mono);font-weight:600;font-variant-numeric:tabular-nums}
-.ticker button{font:inherit;font-size:.78rem;font-weight:600;background:var(--run);color:var(--card);border:0;border-radius:var(--r);padding:6px 10px;cursor:pointer}
 
 /* Notiz */
 textarea{
@@ -270,8 +256,6 @@ td.name small{display:block;font-family:var(--mono);font-size:.72rem;color:var(-
     <button class="ghost" id="themeBtn" type="button">Ansicht: Automatisch</button>
   </div>
 
-  <div id="ticker"></div>
-
   <div class="datebar">
     <button class="nav" id="prevDay" type="button" title="Vortag" aria-label="Vortag">‹</button>
     <label class="datefield">
@@ -291,7 +275,6 @@ td.name small{display:block;font-family:var(--mono);font-size:.72rem;color:var(-
       <div class="stamp">
         <label class="lbl" for="f-start"><b>Arbeitsbeginn</b>Kommen</label>
         <input type="time" id="f-start" data-field="start">
-        <button class="now" type="button" data-now="start">Jetzt</button>
       </div>
 
       <div id="breaks"></div>
@@ -299,11 +282,9 @@ td.name small{display:block;font-family:var(--mono);font-size:.72rem;color:var(-
       <div class="stamp">
         <label class="lbl" for="f-end"><b>Arbeitsende</b>Gehen</label>
         <input type="time" id="f-end" data-field="end">
-        <button class="now" type="button" data-now="end">Jetzt</button>
       </div>
 
       <div class="addline">
-        <button class="btn" id="pauseToggle" type="button">Pause starten</button>
         <button class="btn" id="addBreak" type="button">+ Pause</button>
       </div>
       <p class="hint" id="dayHint"></p>
@@ -345,7 +326,7 @@ td.name small{display:block;font-family:var(--mono);font-size:.72rem;color:var(-
     <p class="hint">Alles bleibt auf diesem Gerät (Browser-Speicher). Sicherung regelmäßig speichern — beim Löschen der Browserdaten sind die Zeiten sonst weg.</p>
   </section>
 
-  <p class="foot">Gestempelte Zeiten werden auf die nächsten 5 Minuten aufgerundet.<br>
+  <p class="foot">Uhrzeiten werden auf die nächsten 5 Minuten aufgerundet.<br>
   Zeiten in Stunden:Minuten. Über Mitternacht wird korrekt gerechnet.</p>
 </div>
 
@@ -387,11 +368,11 @@ function pad(n){ return String(n).padStart(2,"0"); }
 function isoOf(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
 function isoToday(){ return isoOf(new Date()); }
 function parseISO(s){ var p = s.split("-"); return new Date(+p[0], +p[1]-1, +p[2]); }
-var RASTER = 5;                            // Stempelzeiten auf 5 Minuten aufrunden
-function nowHM(){
+var RASTER = 5;                            // Uhrzeiten auf 5 Minuten aufrunden
+var VORLAUF = 60;                          // Vorschlagszeit neuer Tätigkeiten: 1 Stunde voraus
+function vorschlagszeit(){
   var d = new Date();
-  var m = Math.ceil((d.getHours()*60 + d.getMinutes()) / RASTER) * RASTER;
-  return fromMin(m);
+  return fromMin(Math.ceil((d.getHours()*60 + d.getMinutes() + VORLAUF) / RASTER) * RASTER);
 }
 function toMin(s){
   if(!s || !/^\d{1,2}:\d{2}$/.test(s)) return null;
@@ -413,10 +394,6 @@ function hm(min){                          // 455 -> "7:35"
   if(min===null || isNaN(min)) return "–";
   var neg = min<0, x = Math.abs(Math.round(min));
   return (neg?"-":"") + Math.floor(x/60) + ":" + pad(x%60);
-}
-function hms(sec){                         // laufende Uhr
-  var x = Math.max(0, Math.floor(sec));
-  return pad(Math.floor(x/3600)) + ":" + pad(Math.floor(x/60)%60) + ":" + pad(x%60);
 }
 function dec(min){ return (min/60).toFixed(2).replace(".", ","); }
 
@@ -443,14 +420,20 @@ function migrateJob(j){
     delete j.material;
   }
   if(j.arrival === undefined) j.arrival = "";
+  if(j.depart === undefined) j.depart = "";
+  if(j.home === undefined) j.home = j.end || "";   // frühere Von/Bis-Zeiten übernehmen
+  if(!j.arrival && j.start) j.arrival = j.start;
+  delete j.start; delete j.end;
+  if(j.running || j.startedAt){ j.running = false; j.startedAt = null; }
+  if(j.sec !== undefined) delete j.sec;      // Dauer kommt jetzt aus Von/Bis
   if(j.travel === undefined) j.travel = "";
 }
 function lines(s){
   return String(s||"").split("\n").map(function(t){ return t.trim(); }).filter(Boolean);
 }
 function newJob(){
-  return { customer:"", birth:"", arrival:"", travel:"", tasks:[{text:"",time:""}],
-           materials:[{text:""}], start:"", end:"", running:false, startedAt:null };
+  return { customer:"", birth:"", depart:"", arrival:"", travel:"", home:"",
+           tasks:[{text:"",time:vorschlagszeit()}], materials:[{text:""}] };
 }
 function jobTasks(j){ return (j.tasks||[]).filter(function(t){ return (t.text||"").trim(); }); }
 function jobMaterials(j){ return (j.materials||[]).filter(function(m){ return (m.text||"").trim(); }); }
@@ -461,11 +444,9 @@ function isEmptyDay(d){
   if(d.jobs.length) return false;
   return !d.breaks.some(function(b){ return b.from || b.to; });
 }
-function jobSec(j){
-  if(j.running && j.startedAt) return (Date.now()-j.startedAt)/1000;
-  if(typeof j.sec === "number") return j.sec;
-  var s = span(toMin(j.start), toMin(j.end));
-  return s===null ? 0 : s*60;
+function jobMin(j){                        // Zeit beim Kunden: Ankunft bis Heimfahrt
+  var s = span(toMin(j.arrival), toMin(j.home));
+  return s === null ? 0 : s;
 }
 function totals(d){
   var att = span(toMin(d.start), toMin(d.end));
@@ -476,25 +457,8 @@ function totals(d){
   });
   var net = att===null ? null : Math.max(0, att-br);
   var jm = 0;
-  d.jobs.forEach(function(j){ jm += jobSec(j)/60; });
+  d.jobs.forEach(function(j){ jm += jobMin(j); });
   return { att:att, br:br, net:net, jobs:jm };
-}
-function runningJob(){
-  for(var iso in db.days){
-    var js = db.days[iso].jobs || [];
-    for(var i=0;i<js.length;i++) if(js[i].running) return { iso:iso, job:js[i] };
-  }
-  return null;
-}
-function stopAllRunning(){
-  var r;
-  while((r = runningJob())) finishJob(r.job);
-}
-function finishJob(j){
-  j.end = nowHM();
-  delete j.sec;                            // Dauer folgt den gerundeten Zeiten
-  j.running = false;
-  j.startedAt = null;
 }
 
 /* ---------------- DOM ---------------- */
@@ -512,7 +476,6 @@ function renderAll(){
   renderBreaks(d);
   renderJobs(d);
   renderSums();
-  renderTicker();
   renderOverviews();
 }
 
@@ -525,17 +488,12 @@ function renderBreaks(d){
     row.innerHTML =
       '<div class="tag">Pause ' + (d.breaks.length>1 ? (i+1) : "") + '</div>' +
       '<span class="pgrp"><span>von</span>' +
-        '<input type="time" data-break="' + i + '" data-key="from" value="' + (b.from||"") + '" aria-label="Pause Beginn">' +
-        '<button class="now" type="button" data-nowbreak="' + i + '" data-key="from">Jetzt</button></span>' +
+        '<input type="time" data-break="' + i + '" data-key="from" value="' + (b.from||"") + '" aria-label="Pause Beginn"></span>' +
       '<span class="pgrp"><span>bis</span>' +
-        '<input type="time" data-break="' + i + '" data-key="to" value="' + (b.to||"") + '" aria-label="Pause Ende">' +
-        '<button class="now" type="button" data-nowbreak="' + i + '" data-key="to">Jetzt</button></span>' +
+        '<input type="time" data-break="' + i + '" data-key="to" value="' + (b.to||"") + '" aria-label="Pause Ende"></span>' +
       '<button class="icon" type="button" data-delbreak="' + i + '" title="Pause löschen" aria-label="Pause löschen">×</button>';
     box.appendChild(row);
   });
-  var open = d.breaks.some(function(b){ return b.from && !b.to; });
-  $("pauseToggle").textContent = open ? "Pause beenden" : "Pause starten";
-  $("pauseToggle").className = open ? "btn warn" : "btn";
 }
 
 function esc(s){
@@ -553,8 +511,10 @@ function renderJobs(d){
   }
   d.jobs.forEach(function(j, i){
     var el = document.createElement("div");
-    el.className = "job" + (j.running ? " running" : "");
+    el.className = "job";
     el.innerHTML =
+      '<div class="jhead"><span>Auftrag ' + (i+1) + '</span>' +
+        '<button class="icon" type="button" data-deljob="'+i+'" title="Auftrag löschen" aria-label="Auftrag löschen">×</button></div>' +
       '<div class="jfields">' +
         '<div class="names">' +
           '<label class="field"><span>Kunde</span>' +
@@ -563,9 +523,10 @@ function renderJobs(d){
             '<input type="text" data-job="'+i+'" data-key="birth" value="'+esc(j.birth)+'" placeholder="TT.MM.JJJJ" inputmode="numeric"></label>' +
         '</div>' +
         '<div class="names">' +
-          '<div class="field"><span>Ankunft</span><span class="inl">' +
-            '<input type="time" data-job="'+i+'" data-key="arrival" value="'+(j.arrival||"")+'" aria-label="Ankunft beim Kunden">' +
-            '<button class="now" type="button" data-nowjob="'+i+'" data-key="arrival">Jetzt</button></span></div>' +
+          '<label class="field time"><span>Abfahrt</span>' +
+            '<input type="time" data-job="'+i+'" data-key="depart" value="'+(j.depart||"")+'" aria-label="Abfahrt"></label>' +
+          '<label class="field time"><span>Ankunft</span>' +
+            '<input type="time" data-job="'+i+'" data-key="arrival" value="'+(j.arrival||"")+'" aria-label="Ankunft beim Kunden"></label>' +
           '<label class="field mini"><span>Anfahrt (Min.)</span>' +
             '<input type="text" data-job="'+i+'" data-key="travel" value="'+esc(j.travel)+'" placeholder="z. B. 20" inputmode="numeric"></label>' +
         '</div>' +
@@ -574,8 +535,9 @@ function renderJobs(d){
             return '<div class="litem">' +
               '<input type="text" data-tj="'+i+'" data-ti="'+k+'" data-key="text" value="'+esc(t.text)+'" placeholder="Was wurde gemacht?">' +
               '<span class="lrow">' +
+                '<button class="step" type="button" data-tstep="'+i+'" data-idx="'+k+'" data-delta="-15" aria-label="15 Minuten früher">−15</button>' +
                 '<input type="time" data-tj="'+i+'" data-ti="'+k+'" data-key="time" value="'+(t.time||"")+'" aria-label="Uhrzeit der Tätigkeit">' +
-                '<button class="now" type="button" data-nowtask="'+i+'" data-idx="'+k+'">Jetzt</button>' +
+                '<button class="step" type="button" data-tstep="'+i+'" data-idx="'+k+'" data-delta="15" aria-label="15 Minuten später">+15</button>' +
                 '<button class="icon" type="button" data-deltask="'+i+'" data-idx="'+k+'" aria-label="Tätigkeit löschen">×</button>' +
               '</span>' +
             '</div>';
@@ -594,21 +556,18 @@ function renderJobs(d){
           '<button class="addmini" type="button" data-addmat="'+i+'">+ Material</button>' +
         '</div></div>' +
       '</div>' +
-      '<div class="times">' +
-        '<input type="time" data-job="'+i+'" data-key="start" value="'+(j.start||"")+'" aria-label="Auftrag Beginn">' +
-        '<span class="sep">–</span>' +
-        '<input type="time" data-job="'+i+'" data-key="end" value="'+(j.end||"")+'" aria-label="Auftrag Ende">' +
-        '<button class="btn '+(j.running?"warn":"primary")+'" type="button" data-toggle="'+i+'">'+(j.running?"Stopp":"Start")+'</button>' +
-        '<button class="icon" type="button" data-deljob="'+i+'" title="Auftrag löschen" aria-label="Auftrag löschen">×</button>' +
-        '<span class="dur" data-dur="'+i+'">'+jobDurText(j)+'</span>' +
+      '<div class="names jfoot">' +
+        '<label class="field time"><span>Heimfahrt</span>' +
+          '<input type="time" data-job="'+i+'" data-key="home" value="'+(j.home||"")+'" aria-label="Heimfahrt"></label>' +
+        '<div class="field mini"><span>Dauer</span>' +
+          '<span class="dur" data-dur="'+i+'">'+jobDurText(j)+'</span></div>' +
       '</div>';
     box.appendChild(el);
   });
 }
 function jobDurText(j){
-  if(j.running) return hms(jobSec(j));
-  var sec = jobSec(j);
-  return sec>0 ? hm(sec/60) : "–";
+  var min = jobMin(j);
+  return min > 0 ? hm(min) : "–";
 }
 
 function renderSums(){
@@ -626,22 +585,6 @@ function renderSums(){
   $("dayHint").textContent = (t2.att!==null && t2.att<t2.br) ? "Pausen sind länger als die Anwesenheit – bitte Zeiten prüfen." : "";
 }
 
-function renderTicker(){
-  var r = runningJob(), box = $("ticker");
-  if(!r){ box.innerHTML = ""; box.className = ""; return; }
-  box.className = "ticker";
-  var firstTask = jobTasks(r.job)[0];
-  var name = [r.job.customer, firstTask ? firstTask.text : ""].filter(Boolean).join(" · ") || "Auftrag ohne Namen";
-  if(r.iso !== current) name += " (" + deDate(r.iso) + ")";
-  box.innerHTML =
-    '<span class="dot"></span>' +
-    '<span class="who">'+esc(name)+'</span>' +
-    '<span class="t" id="tickerTime">'+hms(jobSec(r.job))+'</span>' +
-    '<button type="button" id="tickerStop">Stopp</button>';
-  $("tickerStop").onclick = function(){
-    stopAllRunning(); save(); renderAll();
-  };
-}
 
 function renderMonth(){
   var ym = current.slice(0,7);
@@ -737,15 +680,12 @@ document.addEventListener("input", function(e){
   if(el.dataset.break !== undefined){
     d.breaks[+el.dataset.break][el.dataset.key] = el.value;
     save(); renderSums(); renderOverviews();
-    var open = d.breaks.some(function(b){ return b.from && !b.to; });
-    $("pauseToggle").textContent = open ? "Pause beenden" : "Pause starten";
-    $("pauseToggle").className = open ? "btn warn" : "btn";
     return;
   }
 
   if(el.dataset.tj !== undefined){
     d.jobs[+el.dataset.tj].tasks[+el.dataset.ti][el.dataset.key] = el.value;
-    save(); renderTicker(); renderOverviews();
+    save(); renderOverviews();
     return;
   }
   if(el.dataset.mj !== undefined){
@@ -757,14 +697,23 @@ document.addEventListener("input", function(e){
   if(el.dataset.job !== undefined){
     var j = d.jobs[+el.dataset.job], k = el.dataset.key;
     j[k] = el.value;
-    if(k==="start" || k==="end"){          // von Hand geändert -> gestoppte Sekunden verwerfen
-      if(j.running){ j.running = false; j.startedAt = null; }
-      delete j.sec;
-      var cell = document.querySelector('[data-dur="'+el.dataset.job+'"]');
-      if(cell) cell.textContent = jobDurText(j);
-    }
-    save(); renderSums(); renderTicker(); renderOverviews();
+    var cell = document.querySelector('[data-dur="'+el.dataset.job+'"]');
+    if(cell) cell.textContent = jobDurText(j);
+    save(); renderSums(); renderOverviews();
     return;
+  }
+});
+
+// Jede bestätigte Uhrzeit auf die nächsten 5 Minuten aufrunden
+document.addEventListener("change", function(e){
+  var el = e.target;
+  if(el.type !== "time" || !el.value) return;
+  var m = toMin(el.value);
+  if(m === null) return;
+  var rounded = fromMin(Math.ceil(m / RASTER) * RASTER);
+  if(rounded !== el.value){
+    el.value = rounded;
+    el.dispatchEvent(new Event("input", { bubbles:true }));   // Modell nachziehen
   }
 });
 
@@ -786,7 +735,7 @@ document.addEventListener("keydown", function(e){
     e.preventDefault();
     if(!el.value.trim()) return;
     var t = +el.dataset.ti;
-    d.jobs[+el.dataset.tj].tasks.splice(t+1, 0, { text:"", time:"" });
+    d.jobs[+el.dataset.tj].tasks.splice(t+1, 0, { text:"", time:vorschlagszeit() });
     save(); renderAll();
     focusAt('[data-tj="'+el.dataset.tj+'"][data-ti="'+(t+1)+'"][data-key="text"]');
   }
@@ -801,35 +750,32 @@ document.addEventListener("click", function(e){
   if(!el) return;
   var d = day(current);
 
-  if(el.dataset.now){ d[el.dataset.now] = nowHM(); save(); renderAll(); return; }
-
-  if(el.dataset.nowbreak !== undefined){
-    d.breaks[+el.dataset.nowbreak][el.dataset.key] = nowHM(); save(); renderAll(); return;
-  }
   if(el.dataset.delbreak !== undefined){
     d.breaks.splice(+el.dataset.delbreak,1);
     if(!d.breaks.length) d.breaks.push({from:"",to:""});
     save(); renderAll(); return;
   }
-  if(el.dataset.nowjob !== undefined){
-    d.jobs[+el.dataset.nowjob][el.dataset.key] = nowHM();
-    writeNow(); renderAll(); return;
-  }
   if(el.dataset.addtask !== undefined){
     var jt = d.jobs[+el.dataset.addtask];
-    jt.tasks.push({ text:"", time:"" });
+    jt.tasks.push({ text:"", time:vorschlagszeit() });
     save(); renderAll();
     focusLast('[data-tj="'+el.dataset.addtask+'"][data-key="text"]');
     return;
   }
-  if(el.dataset.nowtask !== undefined){
-    d.jobs[+el.dataset.nowtask].tasks[+el.dataset.idx].time = nowHM();
-    writeNow(); renderAll(); return;
+  if(el.dataset.tstep !== undefined){
+    var jt2 = d.jobs[+el.dataset.tstep], idx = +el.dataset.idx, t2 = jt2.tasks[idx];
+    var base = toMin(t2.time);
+    if(base === null) base = toMin(vorschlagszeit());
+    t2.time = fromMin(base + (+el.dataset.delta));
+    var box2 = document.querySelector('#jobs [data-tj="'+el.dataset.tstep+'"][data-ti="'+idx+'"][data-key="time"]');
+    if(box2) box2.value = t2.time;          // ohne Neuaufbau, damit Tippen flüssig bleibt
+    writeNow(); renderOverviews();
+    return;
   }
   if(el.dataset.deltask !== undefined){
     var jd2 = d.jobs[+el.dataset.deltask];
     jd2.tasks.splice(+el.dataset.idx, 1);
-    if(!jd2.tasks.length) jd2.tasks.push({ text:"", time:"" });
+    if(!jd2.tasks.length) jd2.tasks.push({ text:"", time:vorschlagszeit() });
     save(); renderAll(); return;
   }
   if(el.dataset.addmat !== undefined){
@@ -851,23 +797,12 @@ document.addEventListener("click", function(e){
     if(confirm("„"+label+"“ löschen?")){ d.jobs.splice(+el.dataset.deljob,1); save(); renderAll(); }
     return;
   }
-  if(el.dataset.toggle !== undefined){
-    var j = d.jobs[+el.dataset.toggle];
-    if(j.running){ finishJob(j); }
-    else{
-      stopAllRunning();                    // immer nur ein Auftrag gleichzeitig
-      j.running = true; j.startedAt = Date.now(); j.start = nowHM(); j.end = ""; delete j.sec;
-      if(!d.start) d.start = nowHM();      // erster Start stempelt den Tag ein
-    }
-    writeNow(); renderAll(); return;       // Stempelzeiten nie verzögert speichern
-  }
 
   switch(el.id){
     case "prevDay": shiftDay(-1); break;
     case "nextDay": shiftDay(1); break;
     case "todayBtn": current = isoToday(); renderAll(); break;
     case "addBreak": d.breaks.push({from:"",to:""}); save(); renderAll(); break;
-    case "pauseToggle": togglePause(d); break;
     case "addJob": addJob(d); break;
     case "csvDays": exportDays(); break;
     case "csvJobs": exportJobs(); break;
@@ -883,18 +818,6 @@ function shiftDay(n){
   current = isoOf(dt);
   renderAll();
 }
-function togglePause(d){
-  var open = null;
-  d.breaks.forEach(function(b){ if(b.from && !b.to) open = b; });
-  if(open){ open.to = nowHM(); }
-  else{
-    var free = null;
-    d.breaks.forEach(function(b){ if(!free && !b.from && !b.to) free = b; });
-    if(free) free.from = nowHM();
-    else d.breaks.push({ from:nowHM(), to:"" });
-  }
-  save(); renderAll();
-}
 function focusLast(sel){
   var all = document.querySelectorAll("#jobs " + sel);
   if(all.length) all[all.length-1].focus();
@@ -906,22 +829,6 @@ function addJob(d){
   if(inputs.length) inputs[inputs.length-1].focus();
 }
 
-/* ---------------- Sekundentakt ---------------- */
-setInterval(function(){
-  var r = runningJob();
-  if(!r) return;
-  var t = $("tickerTime");
-  if(t) t.textContent = hms(jobSec(r.job));
-  if(r.iso === current){
-    var d = day(current);
-    d.jobs.forEach(function(j,i){
-      if(!j.running) return;
-      var cell = document.querySelector('[data-dur="'+i+'"]');
-      if(cell) cell.textContent = hms(jobSec(j));
-    });
-    renderSums();
-  }
-}, 1000);
 
 /* ---------------- Export ---------------- */
 function csvCell(v){
@@ -943,7 +850,6 @@ function monthDays(){
   }).sort();
 }
 function deDate(iso){ var p=iso.split("-"); return p[2]+"."+p[1]+"."+p[0]; }
-function flat(s){ return String(s||"").replace(/\s*\n\s*/g, " · "); }
 
 function exportDays(){
   var list = monthDays();
@@ -960,15 +866,15 @@ function exportDays(){
   download("Zeiterfassung_"+current.slice(0,7)+".csv", rows.map(function(r){ return r.map(csvCell).join(";"); }).join("\r\n"));
 }
 function exportJobs(){
-  var list = monthDays(), rows = [["Datum","Kunde","Geburtsdatum","Ankunft","Anfahrt (Min.)","Tätigkeiten","Material","Von","Bis","Dauer (h)","Dauer (dez.)"]], sum = 0, n = 0;
+  var list = monthDays(), rows = [["Datum","Kunde","Geburtsdatum","Abfahrt","Ankunft","Anfahrt (Min.)","Tätigkeiten","Material","Heimfahrt","Dauer (h)","Dauer (dez.)"]], sum = 0, n = 0;
   list.forEach(function(iso){
     db.days[iso].jobs.forEach(function(j){
-      var min = jobSec(j)/60;
+      var min = jobMin(j);
       sum += min; n++;
-      rows.push([deDate(iso), j.customer, j.birth, j.arrival, j.travel,
+      rows.push([deDate(iso), j.customer, j.birth, j.depart, j.arrival, j.travel,
                  jobTasks(j).map(taskLabel).join(" · "),
                  jobMaterials(j).map(function(m){ return m.text; }).join(" · "),
-                 j.start, j.end, hm(min), dec(min)]);
+                 j.home, hm(min), dec(min)]);
     });
   });
   if(!n) return alert("Für diesen Monat sind keine Aufträge erfasst.");
